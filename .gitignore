@@ -1,0 +1,24 @@
+# Virtual environment folders
+venv/
+env/
+__pycache__/
+
+# VS Code settings
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Environment variables or secrets
+.env
+
+
+*.zip
+*.mp4
+*.exe
+

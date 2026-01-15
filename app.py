@@ -1,67 +1,75 @@
 import flet as ft
-import psycopg2
+from teacher_app.connect import run_query
 
-# --- Database connection ---
-def get_connection():
-    return psycopg2.connect(
-        host="192.168.56.1",
-        database="short_ans_classpoint",
-        user="postgres",
-        password="ahmad1807",
-        port="5432",
-        
-    )
-
-# --- Insert a question ---
-def add_question(question):
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("INSERT INTO questions (text) VALUES (%s);", (question,))
-    conn.commit()
-    cur.close()
-    conn.close()
-
-# --- Retrieve all questions ---
-def get_questions():
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT id, text FROM questions ORDER BY id DESC;")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    return rows
-
-# --- Flet UI ---
 def main(page: ft.Page):
-    page.title = "Teacher Dashboard"
-    page.scroll = "adaptive"
+    page.title = "Student - Short Answer"
+    page.window_width = 450
+    page.window_height = 600
 
-    question_input = ft.TextField(label="Enter a question", width=400)
-    questions_list = ft.Column()
+    # ---------- JOIN CLASS ----------
+    class_code = ft.TextField(label="Class Code", width=300)
+    student_name = ft.TextField(label="Your Name", width=300)
+    error = ft.Text(color="red")
 
-    def refresh_questions():
-        questions_list.controls.clear()
-        for q in get_questions():
-            questions_list.controls.append(ft.Text(f"{q[1]}", size=16))
-        page.update()
+    def join_class(e):
+        rows = run_query(
+            "SELECT id FROM session WHERE class_code=%s",
+            [class_code.value],
+            fetch=True
+        )
+        if not rows:
+            error.value = "Invalid class code"
+            page.update()
+            return
 
-    def on_submit(e):
-        if question_input.value.strip():
-            add_question(question_input.value)
-            question_input.value = ""
-            refresh_questions()
+        run_query(
+            "INSERT INTO student (display_name) VALUES (%s) RETURNING id",
+            [student_name.value]
+        )
 
-    submit_btn = ft.ElevatedButton("Add Question", on_click=on_submit)
+        student_id = run_query(
+            "SELECT id FROM student ORDER BY id DESC LIMIT 1",
+            fetch=True
+        )[0][0]
+
+        show_question(student_id)
 
     page.add(
-        ft.Text("Teacher's Dashboard", size=24, weight="bold"),
-        question_input,
-        submit_btn,
-        ft.Divider(),
-        ft.Text("All Questions:", size=20),
-        questions_list
+        ft.Text("Join Class", size=22, weight="bold"),
+        class_code,
+        student_name,
+        ft.ElevatedButton("Join", on_click=join_class),
+        error
     )
 
-    refresh_questions()
+    # ---------- QUESTION VIEW ----------
+    def show_question(student_id):
+        page.clean()
+
+        q = run_query("SELECT id, prompt FROM active_question", fetch=True)
+        if not q:
+            page.add(ft.Text("No active question"))
+            return
+
+        question_id, prompt = q[0]
+        answer = ft.TextField(label="Your Answer", multiline=True, width=400)
+
+        def submit_answer(e):
+            run_query(
+                """
+                INSERT INTO answer (question_id, student_id, answer_text)
+                VALUES (%s, %s, %s)
+                """,
+                [question_id, student_id, answer.value]
+            )
+            page.snack_bar = ft.SnackBar(ft.Text("Answer submitted"))
+            page.snack_bar.open = True
+            page.update()
+
+        page.add(
+            ft.Text(prompt, size=20, weight="bold"),
+            answer,
+            ft.ElevatedButton("Submit Answer", on_click=submit_answer)
+        )
 
 ft.app(target=main)

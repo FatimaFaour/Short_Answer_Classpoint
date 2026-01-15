@@ -1,224 +1,155 @@
 import flet as ft
-from connect import run_query   # your database helper file
+import requests
+from connect import run_query
+import random
+import string
+import asyncio
 
+def generate_code():
+    return "".join(random.choices(string.digits, k=5))
 
 def main(page: ft.Page):
-    page.title = "Short Answer ClassPoint - Teacher"
-    page.window_width = 500
-    page.window_height = 600
-    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    page.title = "Teacher Dashboard"
+    page.window_width = 600
+    page.window_height = 750
 
-    # ========== SHARED VIEW SWITCHING ==========
-    def show_login():
-        page.clean()
-        page.add(login_view)
-
-    def show_signup():
-        page.clean()
-        page.add(signup_view)
-
-    # ========== LOGIN VIEW ==========
     email = ft.TextField(label="Email", width=350)
-    password = ft.TextField(label="Password", password=True, can_reveal_password=True, width=350)
-    login_error = ft.Text("", color="#FF0000")
+    error = ft.Text(color="red")
 
-    def login_clicked(e):
+    session_id = None
+    current_question_id = None
+    answers_column = ft.Column(scroll=ft.ScrollMode.AUTO)
+
+
+    def login(e):
         rows = run_query(
-            "SELECT display_name FROM teacher WHERE email=%s AND password_hash=%s",
-            [email.value, password.value],
-            fetch=True,
+            "SELECT id, name FROM teachers WHERE email=%s",
+            [email.value],
+            fetch=True
         )
         if rows:
-            teacher_name = rows[0][0]
-            show_dashboard(teacher_name)
+            teacher_id, name = rows[0]
+            show_dashboard(teacher_id, name)
         else:
-            login_error.value = "Invalid email or password"
+            error.value = "Teacher not found"
             page.update()
 
-    login_button = ft.ElevatedButton("Sign in", on_click=login_clicked)
-    signup_link = ft.TextButton("Create a new account", on_click=lambda e: show_signup())
-
-    login_view = ft.Column(
-        [
-            ft.Text("Teacher Login", size=22, weight="bold"),
-            email,
-            password,
-            login_button,
-            signup_link,
-            login_error,
-        ],
-        alignment=ft.MainAxisAlignment.CENTER,
-        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+    page.add(
+        ft.Text("Teacher Login", size=22, weight="bold"),
+        email,
+        ft.ElevatedButton("Login", on_click=login),
+        error
     )
 
-    # ========== SIGN-UP VIEW ==========
-    name_field = ft.TextField(label="Full Name", width=350)
-    email_field = ft.TextField(label="Email", width=350)
-    password_field = ft.TextField(
-        label="Password", password=True, can_reveal_password=True, width=350
-    )
-    confirm_field = ft.TextField(
-        label="Confirm Password", password=True, can_reveal_password=True, width=350
-    )
-    signup_error = ft.Text("", color="#FF0000")
-    signup_success = ft.Text("", color="#00AA00")
+    def show_dashboard(teacher_id, teacher_name):
+        nonlocal current_question_id
+        page.clean()
 
-    def signup_clicked(e):
-        if password_field.value != confirm_field.value:
-            signup_error.value = "Passwords do not match"
-            signup_success.value = ""
-        elif not email_field.value or not password_field.value or not name_field.value:
-            signup_error.value = "Please fill all fields"
-            signup_success.value = ""
-        else:
-            # check if email already exists
-            rows = run_query(
-                "SELECT id FROM teacher WHERE email=%s",
-                [email_field.value],
-                fetch=True,
-            )
-            if rows:
-                signup_error.value = "Email already exists"
-                signup_success.value = ""
-            else:
-                run_query(
-                    "INSERT INTO teacher (email, display_name, password_hash) VALUES (%s, %s, %s)",
-                    [email_field.value, name_field.value, password_field.value],
-                )
-                signup_error.value = ""
-                signup_success.value = "Account created successfully!"
-        page.update()
+        code = generate_code()
+        nonlocal session_id
 
-    signup_button = ft.ElevatedButton("Sign up", on_click=signup_clicked)
-    back_to_login = ft.TextButton("Back to Login", on_click=lambda e: show_login())
-
-    signup_view = ft.Column(
-        [
-            ft.Text("Create Teacher Account", size=22, weight="bold"),
-            name_field,
-            email_field,
-            password_field,
-            confirm_field,
-            signup_button,
-            signup_error,
-            signup_success,
-            back_to_login,
-        ],
-        alignment=ft.MainAxisAlignment.CENTER,
-        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-    )
-
-    # ========== DASHBOARD ==========
-    def show_dashboard(teacher_name):
-        question_prompt = ft.TextField(label="Question prompt", multiline=True, width=400)
-
-        # main options
-        allow_multiple = ft.Checkbox(label="Allow multiple submissions (up to 3)")
-        hide_names = ft.Checkbox(label="Hide participant names when viewing responses")
-
-        # play options
-        play_title = ft.Text("Play Options", size=18, weight="bold")
-        start_with_slide = ft.Checkbox(label="Start activity with slide")
-        minimize_window = ft.Checkbox(label="Minimize activity window after activity starts")
-
-        auto_close = ft.Checkbox(label="Auto-close submission after")
-        auto_close_value = ft.TextField(
-            hint_text="Enter number", width=100, input_filter=ft.NumbersOnlyInputFilter()
-        )
-        auto_close_unit = ft.Dropdown(
-            options=[
-                ft.dropdown.Option("sec"),
-                ft.dropdown.Option("min"),
-                ft.dropdown.Option("hour"),
-            ],
-            width=100,
+        result = run_query(
+            """
+            INSERT INTO sessions (teacher_id, code)
+            VALUES (%s, %s)
+            RETURNING id
+            """,
+            [teacher_id, code],
+            fetch=True
         )
 
-        # when clicking "Start collecting answers"
-        def start_collecting(e):
-            prompt = question_prompt.value
-            allow = allow_multiple.value
-            hide = hide_names.value
+        session_id = result[0][0]
 
-            # convert time to seconds if given
-            seconds = None
-            if auto_close.value and auto_close_value.value:
-                try:
-                    n = int(auto_close_value.value)
-                    unit = auto_close_unit.value
-                    if unit == "min":
-                        seconds = n * 60
-                    elif unit == "hour":
-                        seconds = n * 3600
-                    else:
-                        seconds = n
-                except:
-                    seconds = None
 
-            run_query(
+        question_input = ft.TextField(label="Question", multiline=True, width=450)
+
+        def start_question(e):
+            nonlocal current_question_id
+            q = run_query(
                 """
-                INSERT INTO activity (session_id, prompt, allow_multiple, hide_names, auto_close_sec)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO questions (session_id, text, is_open)
+                VALUES (
+                    (SELECT id FROM sessions WHERE code=%s AND is_active=true),
+                    %s,
+                    true
+                )
+                RETURNING id
                 """,
-                [1, prompt, allow, hide, seconds],  # temp session_id=1
+                [code, question_input.value],
+                fetch=True
             )
 
-            page.snack_bar = ft.SnackBar(ft.Text("Question launched! Collecting answers..."))
+            current_question_id = q[0][0]
+
+            page.snack_bar = ft.SnackBar(ft.Text("Question started"))
             page.snack_bar.open = True
             page.update()
 
-        start_button = ft.ElevatedButton("Start collecting answers", on_click=start_collecting)
+        def close_question(e):
+            run_query(
+                """
+                UPDATE questions
+                SET is_open=false
+                WHERE id=%s
+                """,
+                [current_question_id]
+            )
 
-        # options panel (hidden until teacher clicks button)
-        options_panel = ft.Container(
-            content=ft.Column(
-                [
-                    ft.Text("Question Options", size=20, weight="bold"),
-                    question_prompt,
-                    allow_multiple,
-                    hide_names,
-                    play_title,
-                    start_with_slide,
-                    minimize_window,
-                    ft.Row([auto_close, auto_close_value, auto_close_unit]),
-                    start_button,
-                ],
-                tight=True,
-                spacing=8,
-            ),
-            bgcolor="#F0F0F0",
-            padding=15,
-            border_radius=10,
-            visible=False,
-            width=430,
-        )
-
-        def open_options_panel(e):
-            options_panel.visible = True
+            page.snack_bar = ft.SnackBar(ft.Text("Question closed"))
+            page.snack_bar.open = True
             page.update()
 
-        add_to_slide_btn = ft.FloatingActionButton(
-            text="Add Question to Slide", on_click=open_options_panel
+        def refresh_answers():
+            nonlocal current_question_id, session_id
+
+            if not session_id:
+                return
+
+            # If question not known yet, fetch it
+            if not current_question_id:
+                q = requests.get(
+                    f"http://127.0.0.1:8000/api/question/{session_id}"
+                ).json()
+
+                if not q or not q.get("id"):
+                    return
+
+                current_question_id = q["id"]
+
+            res = requests.get(
+                f"http://127.0.0.1:8000/api/answers/{current_question_id}"
+            )
+
+            answers_column.controls.clear()
+
+            for a in res.json():
+                answers_column.controls.append(
+                    ft.Text(f"{a['name']}: {a['text']}")
+                )
+
+            page.update()
+
+
+
+        # auto refresh every 2 seconds
+        async def auto_refresh():
+            while True:
+                await asyncio.sleep(2)
+                refresh_answers()
+
+        page.run_task(auto_refresh)
+
+
+
+        page.add(
+            ft.Text(f"Welcome {teacher_name}", size=22, weight="bold"),
+            ft.Text(f"Session Code: {code}", size=18),
+            question_input,
+            ft.ElevatedButton("Start Question", on_click=start_question),
+            ft.ElevatedButton("Close Question", on_click=close_question),
+            ft.Divider(),
+            ft.Text("Live Answers", size=20, weight="bold"),
+            answers_column
         )
-
-        dashboard_view = ft.Column(
-            [
-                ft.Text(f"Welcome, {teacher_name}", size=22, weight="bold"),
-                ft.Text("Click below to add a question to your slide."),
-                add_to_slide_btn,
-                options_panel,
-            ],
-            alignment=ft.MainAxisAlignment.START,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=20,
-        )
-
-        page.clean()
-        page.add(dashboard_view)
-
-    # start at login
-    page.add(login_view)
-
 
 ft.app(target=main)

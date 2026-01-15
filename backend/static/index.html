@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Join Class</title>
+</head>
+<body>
+
+<h2>Join Class</h2>
+
+<input id="code" placeholder="Session Code"><br><br>
+<input id="name" placeholder="Your Name"><br><br>
+<button onclick="join()">Join</button>
+
+<div id="question"></div>
+<textarea id="answer" placeholder="Your answer"></textarea><br>
+<button onclick="submit()">Submit</button>
+
+<script>
+let studentId = null;
+let participantId = null;
+let sessionId = null;
+let questionId = null;
+
+async function join() {
+  const res = await fetch("/api/join", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      code: document.getElementById("code").value,
+      nickname: document.getElementById("name").value
+    })
+  });
+
+  const data = await res.json();
+  if (data.error) {
+    alert(data.error);
+    return;
+  }
+
+  studentId = data.student_id;
+  participantId = data.participant_id;
+  sessionId = data.session_id;
+
+  document.getElementById("question").innerText =
+    "Joined successfully. Waiting for question...";
+}
+
+async function loadQuestion() {
+  if (!sessionId) return;
+
+  const res = await fetch(`/api/question/${sessionId}`);
+  const data = await res.json();
+
+  if (!data || !data.id) {
+    document.getElementById("question").innerText =
+      "Waiting for teacher question...";
+    questionId = null;
+    return;
+  }
+
+  questionId = data.id;
+  document.getElementById("question").innerText = data.text;
+}
+
+// auto refresh every 2 seconds (ClassPoint behavior)
+setInterval(loadQuestion, 2000);
+
+async function submit() {
+  if (!questionId) {
+    alert("No active question");
+    return;
+  }
+
+  await fetch("/api/answer", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      question_id: questionId,
+      student_id: studentId,
+      participant_id: participantId,
+      answer: document.getElementById("answer").value
+    })
+  });
+
+  alert("Answer submitted!");
+  document.getElementById("answer").value = "";
+}
+</script>
+
+
+
+</body>
+</html>

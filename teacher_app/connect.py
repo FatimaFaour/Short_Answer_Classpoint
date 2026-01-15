@@ -1,7 +1,6 @@
 import psycopg2
 
 def get_connection():
-    # edit these values for your setup
     return psycopg2.connect(
         dbname="short_ans_classpoint",
         user="postgres",
@@ -10,7 +9,6 @@ def get_connection():
         port="5432"
     )
 
-# example helper
 def run_query(sql, params=None, fetch=False):
     conn = get_connection()
     cur = conn.cursor()

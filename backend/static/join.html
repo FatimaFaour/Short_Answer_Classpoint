@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1ecc92",
+                        "background-light": "#fafaf9",
+                        "background-dark": "#272e35",
+                        "accent-coral": "#F28C6B",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    
+</script>
+
+<style>
+        body {
+            font-family: "Spline Sans", sans-serif;
+        }
+        .bg-pattern {
+            background-color: transparent;
+            background-image: radial-gradient(#1ecc92 0.5px, transparent 0.5px), radial-gradient(#F28C6B 0.5px, #fafaf9 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+        .dark .bg-pattern {
+            background-image: radial-gradient(#1ecc92 0.5px, transparent 0.5px), radial-symbols-outlined(#F28C6B 0.5px, #272e35 0.5px);
+            background-color: #272e35;
+        }
+    </style>
+</head>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const inputs = document.querySelectorAll("fieldset input");
+
+  inputs.forEach((input, index) => {
+    input.addEventListener("input", () => {
+      input.value = input.value.replace(/\D/g, "");
+      if (input.value && inputs[index + 1]) {
+        inputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && !input.value && inputs[index - 1]) {
+        inputs[index - 1].focus();
+      }
+    });
+
+    input.addEventListener("paste", (e) => {
+      e.preventDefault();
+      const paste = e.clipboardData
+        .getData("text")
+        .replace(/\D/g, "")
+        .slice(0, inputs.length);
+
+      paste.split("").forEach((char, i) => {
+        if (inputs[i]) inputs[i].value = char;
+      });
+
+      const last = Math.min(paste.length, inputs.length) - 1;
+      if (inputs[last]) inputs[last].focus();
+    });
+  });
+
+  window.handleJoin = async function () {
+    const code = Array.from(inputs).map(i => i.value).join("");
+
+    if (code.length !== 5) {
+      alert("Please enter the 5-digit class code");
+      return;
+    }
+
+    const res = await fetch("/api/join", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code, nickname: "temp" })
+    });
+
+    const data = await res.json();
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+
+    localStorage.setItem("sessionId", data.session_id);
+    localStorage.setItem("studentId", data.student_id);
+    localStorage.setItem("participantId", data.participant_id);
+    localStorage.setItem("classCode", code); // ✅ THIS WAS MISSING
+
+    window.location.href = "/static/profile.html";
+  };
+});
+</script>
+
+<body class="bg-background-light dark:bg-background-dark font-display transition-colors duration-300">
+<div class="relative min-h-screen w-full flex flex-col overflow-x-hidden">
+<!-- Abstract Background Shapes -->
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40 dark:opacity-10">
+<div class="absolute top-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full border-[1px] border-primary/30"></div>
+<div class="absolute top-[20%] right-[-10%] w-[300px] h-[300px] rotate-45 border-[1px] border-accent-coral/40"></div>
+<div class="absolute bottom-[10%] left-[15%] w-24 h-24 border-2 border-dashed border-primary/40 rounded-lg rotate-12"></div>
+<div class="absolute top-[60%] right-[20%]">
+<svg class="text-accent-coral/30" fill="none" height="100" viewbox="0 0 100 100" width="100" xmlns="http://www.w3.org/2000/svg">
+<circle cx="50" cy="50" r="40" stroke="currentColor" stroke-dasharray="10 5" stroke-width="1"></circle>
+</svg>
+</div>
+</div>
+<div class="layout-container relative z-10 flex h-full grow flex-col">
+<!-- TopNavBar Component -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200/60 dark:border-slate-700/60 px-6 md:px-10 py-4 bg-white/70 dark:bg-background-dark/70 backdrop-blur-md">
+<div class="flex items-center gap-4 text-[#0e1b16] dark:text-white">
+<div class="size-8 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-tight">Classpoint</h2>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-xl size-10 bg-primary/10 dark:bg-primary/20 text-primary hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-xl size-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-all">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-primary/20 shadow-sm" data-alt="User profile avatar smiling" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDR81vhZnafdHb0pZktwob6R_dgVtioEPt2AcbOO1e4xkgBk0jDSaGF_YgnV-W4XmNZUwRAu8YZQNQP1yUz5CvVBJdq6M19TsmkHG26U9Ae5iVE3km_qGT5JwVXGd09znllpu0njvNIE2InQMCdJZ1T2voFrdGoUCZmFS04fwr6WiwWUlkiNA0-EjusBaUqT-DU9wDKdqCaY9kgFgcTIHcQETaYrTC-FX2U2m-LjKaVxLZFqtUAIgVLQ7b20yks69BF6VuWWAdYxmQ");'></div>
+</div>
+</header>
+<main class="flex-1 flex items-center justify-center p-6">
+<!-- Central Bento Card -->
+<div class="w-full max-w-[520px] bg-white dark:bg-slate-900 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100 dark:border-slate-800 p-8 md:p-12">
+<div class="flex flex-col items-center">
+<!-- Decorative Icon -->
+<div class="size-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-4xl">school</span>
+</div>
+<!-- HeadlineText -->
+<h1 class="text-[#0e1b16] dark:text-white tracking-tight text-3xl font-bold leading-tight text-center pb-2">Ready to start learning?</h1>
+<!-- BodyText -->
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-relaxed text-center pb-8 max-w-[340px]">Enter the 5-digit code provided by your instructor to join the classroom.</p>
+<!-- ConfirmationCode (Modified for Modern UI) -->
+<div class="w-full flex justify-center mb-8">
+<fieldset class="relative flex gap-2 md:gap-3">
+<input
+  type="text"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  maxlength="1"
+  class="flex h-14 md:h-16 w-10 md:w-12 text-center rounded-lg border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-0 text-xl font-bold text-slate-800 dark:text-white transition-all"
+/>
+<input
+  type="text"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  maxlength="1"
+  class="flex h-14 md:h-16 w-10 md:w-12 text-center rounded-lg border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-0 text-xl font-bold text-slate-800 dark:text-white transition-all"
+/>
+<input
+  type="text"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  maxlength="1"
+  class="flex h-14 md:h-16 w-10 md:w-12 text-center rounded-lg border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-0 text-xl font-bold text-slate-800 dark:text-white transition-all"
+/>
+<input
+  type="text"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  maxlength="1"
+  class="flex h-14 md:h-16 w-10 md:w-12 text-center rounded-lg border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-0 text-xl font-bold text-slate-800 dark:text-white transition-all"
+/>
+<input
+  type="text"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  maxlength="1"
+  class="flex h-14 md:h-16 w-10 md:w-12 text-center rounded-lg border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-0 text-xl font-bold text-slate-800 dark:text-white transition-all"
+/>
+</fieldset>
+</div>
+<!-- SingleButton Component -->
+<div class="w-full flex justify-center mb-6">
+<button
+  onclick="handleJoin()"
+  class="w-full max-w-sm flex items-center justify-center rounded-xl h-14 bg-primary text-slate-900 text-lg font-bold tracking-tight hover:brightness-105 active:scale-95 transition-all shadow-lg shadow-primary/20">
+<span class="truncate">Join Class</span>
+<span class="material-symbols-outlined ml-2">arrow_forward</span>
+</button>
+</div>
+<!-- Additional Helper Text -->
+<div class="flex flex-col gap-2 items-center">
+<a class="text-sm font-medium text-slate-400 hover:text-primary transition-colors" href="#">Where do I find my code?</a>
+<div class="h-px w-8 bg-slate-100 dark:bg-slate-800 my-2"></div>
+<p class="text-sm text-slate-500">Don't have a code? <a class="text-accent-coral font-semibold hover:underline decoration-2 underline-offset-4" href="#">Browse public classes</a></p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Small Component -->
+<footer class="p-8 text-center">
+<p class="text-xs text-slate-400 dark:text-slate-600 uppercase tracking-widest font-bold">Short Answer ClassPoint</p>
+</footer>
+</div>
+</div>
+</body></html>

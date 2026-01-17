@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Profile Setup | Virtual Classroom</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1ecc92",
+                        "background-light": "#fafaf9",
+                        "background-dark": "#272e35",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Spline Sans", sans-serif;
+        }
+        .upload-dashed {
+            border: 2px dashed #1ecc92;
+        }
+        .upload-dashed:hover {
+            background-color: rgba(30, 204, 146, 0.05);
+        }
+    </style>
+</head>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const studentId = localStorage.getItem("studentId");
+  const participantId = localStorage.getItem("participantId");
+  const sessionId = localStorage.getItem("sessionId");
+  const classCode = localStorage.getItem("classCode");
+
+  if (!studentId || !participantId || !sessionId) {
+    alert("Session expired. Please join the class again.");
+    window.location.href = "/static/join.html";
+    return;
+  }
+
+  // ===== Class code =====
+  const classCodeEl = document.getElementById("classCode");
+  if (classCodeEl && classCode) {
+    classCodeEl.textContent = classCode;
+  }
+
+  // ===== Avatar preview (✅ FIXED) =====
+  const avatarInput = document.getElementById("avatarInput");
+  const avatarPreview = document.getElementById("avatarPreview");
+
+  avatarInput.addEventListener("change", () => {
+    const file = avatarInput.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
+      avatarInput.value = "";
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image must be smaller than 2MB");
+      avatarInput.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+  const imgData = reader.result;
+
+  // Show preview
+  avatarPreview.style.backgroundImage = `url(${imgData})`;
+  avatarPreview.innerHTML = "";
+
+  // ✅ SAVE FOR DASHBOARD
+  localStorage.setItem("avatarImage", imgData);
+};
+
+    reader.readAsDataURL(file);
+  });
+
+  // ===== Save profile =====
+  window.saveProfile = async function (e) {
+    e.preventDefault();
+
+    const fullName = document.getElementById("fullName").value.trim();
+    if (!fullName) {
+      alert("Please enter your full name");
+      return;
+    }
+
+    const res = await fetch("/api/student/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        student_id: Number(studentId),
+        participant_id: Number(participantId),
+        full_name: fullName
+      })
+    });
+
+    if (!res.ok) {
+      alert("Failed to save profile");
+      return;
+    }
+
+    window.location.replace("/static/dashboard.html");
+  };
+});
+</script>
+
+
+<body class="bg-background-light dark:bg-background-dark text-[#0e1b16] dark:text-white min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between border-b border-solid border-[#e8f3ef] dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<svg fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold tracking-tight">Virtual Classroom</h2>
+</div>
+<div class="flex items-center gap-6">
+
+  <!-- Class Code -->
+  <div class="flex items-center gap-2">
+    <span class="material-symbols-outlined text-primary">key</span>
+    <span class="text-sm font-semibold">
+      Code:
+      <span id="classCode" class="text-primary tracking-widest font-extrabold ml-1"></span>
+    </span>
+  </div>
+
+  <!-- Profile Completion -->
+  <div class="flex flex-col w-32">
+    <div class="flex justify-between text-[11px] font-semibold text-slate-500 mb-1">
+      <span>Profile</span>
+      <span id="profilePercent">50%</span>
+    </div>
+    <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+      <div
+        id="profileBar"
+        class="h-full bg-primary rounded-full transition-all"
+        style="width: 50%;"
+      ></div>
+    </div>
+  </div>
+
+  <!-- Sign Out -->
+  <button
+    onclick="signOut()"
+    class="flex items-center justify-center rounded-xl h-10 px-4 bg-[#e8f3ef] dark:bg-gray-700 text-[#0e1b16] dark:text-white text-sm font-bold hover:scale-105 active:scale-95 transition-all"
+  >
+    Sign Out
+  </button>
+
+</div>
+
+</header>
+<!-- Progress Indicator -->
+
+<!-- Main Content Container -->
+<main class="flex-grow flex items-center justify-center p-6">
+<div class="max-w-[1100px] w-full grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden min-h-[500px]">
+<!-- Left Side: Illustration & Branding -->
+<div class="hidden lg:flex flex-col justify-center items-center bg-[#f0f9f6] dark:bg-gray-900 p-12 text-center">
+<div class="w-full max-w-[350px] aspect-square rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center relative overflow-hidden mb-8">
+<!-- Abstract Illustration Pattern -->
+<div class="absolute inset-0 opacity-20" data-alt="abstract geometric learning patterns with books and shapes" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDMiZPgee7ZlmoFOanLfP30WtmNjLe0qvAYpqBbX8YO2MjiN7fMBqiYESp_Zw4sfJWStRXtvQQendtADaYniWIDuOAup-taMwksG0bCD2ZSLUMCrW0A6ybeYARy17tE5QBIIe9f2jD7fyvR4xMQ7nOfc5BHbK9aslHSAIc85jXhEcqusYARl2ps4Bl15NEC1pGPYUdokWElumtz_PlLHYWzxxVC74DYCg9kV1yFqa2Gxo-LKXHBcb1yUVu7Q1Sqp9XAVxM7m75Nkdk");'></div>
+<div class="z-10 bg-white dark:bg-gray-800 p-8 rounded-full shadow-lg border-4 border-primary">
+<span class="material-symbols-outlined text-primary text-7xl">school</span>
+</div>
+<!-- Floating UI elements -->
+<div class="absolute top-10 right-10 bg-white dark:bg-gray-700 p-3 rounded-lg shadow-md flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500">star</span>
+<span class="text-xs font-bold">Earn Badges</span>
+</div>
+<div class="absolute bottom-10 left-10 bg-white dark:bg-gray-700 p-3 rounded-lg shadow-md flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-500">group</span>
+<span class="text-xs font-bold">Collaborate</span>
+</div>
+</div>
+<h3 class="text-2xl font-bold mb-4">You're almost in!</h3>
+<p class="text-gray-600 dark:text-gray-400 max-w-sm">
+                    Setting up your profile helps teachers identify you during live sessions and group projects.
+                </p>
+</div>
+<!-- Right Side: Profile Form -->
+<div class="flex flex-col justify-center p-8 lg:p-12">
+<div class="mb-8">
+<h1 class="text-3xl font-bold mb-2">Tell us about yourself</h1>
+<!--<p class="text-gray-500 dark:text-gray-400">Personalize your student identity before joining.</p>-->
+</div>
+<form class="space-y-8" onsubmit="saveProfile(event)">
+<!-- Profile Picture Upload -->
+<div class="flex flex-col items-center sm:flex-row gap-6">
+<div class="relative group">
+<div
+  id="avatarPreview"
+  class="size-32 rounded-full upload-dashed flex flex-col items-center justify-center cursor-pointer transition-all bg-gray-50 dark:bg-gray-700 overflow-hidden relative bg-cover bg-center"
+>
+<div class="absolute inset-0 bg-center bg-cover hidden group-hover:block opacity-10" data-alt="abstract profile placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA-uIug3N63qcU7cqQFYRyMRNHSCjlQB2ZApnzmWZDeJ7xCsWEiLB2MVZjB6KMDjndwAkwzVRT66niEBrn4Z-Bqy-wKYPYMzl0VmA6mOG5sBvy_GU3IPMQke1t_k0t4XpZ0kNW0nkR4dLIMJEGScQUeI1yzFvSptkB4m7NyqyMaRa9oM5CGLWl2J8cBCdj8mkwU1yTmGUkE9fwMZf0dUEKPADH2eZeCVwWvW-3pOXrQ30RpZx0pQf3lQBQJEB_rMKdHrLeFugoAB2M');"></div>
+<span class="material-symbols-outlined text-primary text-4xl mb-1">add_a_photo</span>
+<span class="text-[10px] uppercase font-bold text-primary tracking-widest">Upload</span>
+<input
+  id="avatarInput"
+  class="absolute inset-0 opacity-0 cursor-pointer"
+  type="file"
+  accept="image/*"
+/>
+
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-white p-1.5 rounded-full border-4 border-white dark:border-gray-800">
+<span class="material-symbols-outlined text-sm">edit</span>
+</div>
+</div>
+<div class="flex-1 text-center sm:text-left">
+<h4 class="font-bold text-lg">Profile Picture</h4>
+<p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Recommended: Square JPG or PNG, max 2MB.</p>
+<button class="text-primary text-sm font-bold hover:underline" type="button">Choose from gallery</button>
+</div>
+</div>
+<!-- Input Fields -->
+<div class="space-y-4">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                Full Name <span class="text-red-500">*</span>
+</label>
+<input
+  id="fullName"
+  class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+  placeholder="e.g. Batoul, Fatima"
+  required
+  type="text"
+/>
+</div>
+<!--<div class="flex flex-col gap-2">
+<label class="text-sm font-bold text-gray-700 dark:text-gray-300">
+                                Preferred Display Name (Optional)
+                            </label>
+<input class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="How others see you" type="text"/>
+<p class="text-xs text-gray-400">This could be your nickname or just your first name.</p>
+</div>
+</div>-->
+<!-- Navigation Actions -->
+<div class="flex flex-col sm:flex-row gap-4 pt-4">
+<button class="flex-1 bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all" type="submit">
+                            Complete Setup
+                        </button>
+<!--<button class="px-8 py-4 text-gray-500 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all" type="button">
+                            Skip for now
+                        </button>-->
+</div>
+</form>
+<div class="mt-8 flex items-center justify-center gap-2 text-xs text-gray-400">
+<span class="material-symbols-outlined text-sm">lock</span>
+                    Your data is secure and only visible to your class members.
+                </div>
+</div>
+</div>
+</main>
+
+</body>
+<script>
+function signOut() {
+  localStorage.clear();
+  window.location.href = "/static/join.html";
+}
+</script>
+</html>

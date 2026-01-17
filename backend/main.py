@@ -173,6 +173,20 @@ def get_answers(question_id: int):
     ]
 
 # ------------------ STAR / UNSTAR ANSWER ------------------
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        "UPDATE answers SET starred = NOT starred WHERE id = %s",
+        (answer_id,)
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"status": "ok"}
+
 @app.post("/api/star/{answer_id}")
 def toggle_star(answer_id: int):
     conn = get_connection()

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Interactive Questions Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1ecc92",
+                        "background-light": "#fafaf9",
+                        "background-dark": "#272e35",
+                        "accent-coral": "#F28C6B",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Spline Sans', sans-serif;
+        }
+        .masonry-grid {
+            column-count: 3;
+            column-gap: 1.5rem;
+        }
+        @media (max-width: 1024px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+        @media (max-width: 640px) {
+            .masonry-grid {
+                column-count: 1;
+            }
+        }
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const sessionId = localStorage.getItem("sessionId");
+  const studentId = localStorage.getItem("studentId");
+  const participantId = localStorage.getItem("participantId");
+  const classCode = localStorage.getItem("classCode");
+
+  // Session validation
+  if (!sessionId || !studentId || !participantId) {
+    alert("Session expired. Please join again.");
+    window.location.href = "/static/join.html";
+    return;
+  }
+
+  // Show class code in header
+  const classCodeEl = document.getElementById("classCode");
+  if (classCodeEl && classCode) {
+    classCodeEl.textContent = classCode;
+  }
+  let timeLeft = 30; // seconds
+let timerInterval = null;
+
+function startTimer(duration = 30) {
+  clearInterval(timerInterval);
+  timeLeft = duration;
+
+  const timerEl = document.getElementById("timer");
+  const input = document.getElementById("answerInput");
+
+  timerEl.textContent = `⏱ 00:${timeLeft.toString().padStart(2, "0")}`;
+  input.contentEditable = "true";
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+
+    timerEl.textContent = `⏱ 00:${timeLeft.toString().padStart(2, "0")}`;
+
+    if (timeLeft <= 5) {
+      timerEl.classList.add("text-red-500");
+    }
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerEl.textContent = "⏱ Time up";
+      input.contentEditable = "false";
+      input.classList.add("opacity-50");
+    }
+  }, 1000);
+}
+
+  const questionArea = document.getElementById("questionArea");
+  const waitingArea = document.getElementById("waitingArea");
+  const questionText = document.getElementById("questionText");
+  const answerInput = document.getElementById("answerInput");
+
+  let currentQuestionId = null;
+
+  // Change class (back to join)
+  window.changeClass = function () {
+    localStorage.clear();
+    window.location.href = "/static/join.html";
+  };
+
+  // Load active question
+  async function loadQuestion() {
+    try {
+      const res = await fetch(`/api/question/${sessionId}`);
+      const data = await res.json();
+
+      // No active question
+      if (!data.id) {
+        questionArea.classList.add("hidden");
+        waitingArea.classList.remove("hidden");
+        currentQuestionId = null;
+        return;
+      }
+
+      // Active question
+      currentQuestionId = data.id;
+      questionText.textContent = data.text;
+
+      waitingArea.classList.add("hidden");
+      questionArea.classList.remove("hidden");
+    } catch (err) {
+      console.error("Error loading question:", err);
+    }
+  }
+
+  // Submit answer
+  window.submitAnswer = async function () {
+    if (!currentQuestionId) return;
+
+    const answer = answerInput.innerHTML.trim();
+    if (!answer) {
+      alert("Please write an answer first.");
+      return;
+    }
+
+    try {
+      await fetch("/api/answer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question_id: currentQuestionId,
+          student_id: studentId,
+          participant_id: participantId,
+          answer: answer
+        })
+      });
+
+      answerInput.innerHTML = "";
+      alert("Answer submitted ✅");
+    } catch (err) {
+      console.error("Error submitting answer:", err);
+      alert("Failed to submit answer");
+    }
+  };
+
+  // Poll every 2 seconds
+  loadQuestion();
+  setInterval(loadQuestion, 2000);
+});
+</script>
+<script>
+function formatText(cmd) {
+  document.execCommand(cmd, false, null);
+}
+
+function setColor(color) {
+  document.execCommand("foreColor", false, color);
+}
+
+</script>
+
+
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased transition-colors duration-300">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-hidden relative">
+<!-- Top Navigation Bar -->
+<header class="h-20 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 px-8 flex items-center justify-between z-10">
+<div class="flex items-center gap-6">
+    <div class="bg-primary p-2 rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">school</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight tracking-tight">Student Classpoint</h1>
+<p class="text-xs text-primary font-semibold uppercase tracking-wider">Virtual Classroom</p>
+</div>
+<div class="h-6 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">key</span>
+
+<h2
+  id="classHeader"
+  class="text-xl font-bold tracking-tight"
+>
+  Class Code:
+  <span
+    id="classCode"
+    class="text-primary ml-2 tracking-widest font-extrabold"
+  ></span>
+</h2>
+
+</div>
+
+<label class="relative flex items-center w-80 group">
+<span class="material-symbols-outlined absolute left-3 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full h-10 pl-10 pr-4 bg-slate-100 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/50 text-sm transition-all" placeholder="Search questions..." type="text"/>
+</label>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+  <button id="profileBtn" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center border-2 border-primary/40"></button>
+
+  <!-- Dropdown -->
+  <div
+    id="profileMenu"
+    class="hidden absolute right-0 mt-2 w-40 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden z-50"
+  >
+    <button
+      onclick="goToProfile()"
+      class="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
+    >
+      Edit Profile
+    </button>
+    <button
+      onclick="logout()"
+      class="w-full px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+    >
+      Logout
+    </button>
+  </div>
+</div>
+
+
+</div>
+</header>
+<!-- Dashboard Content Scroll Area -->
+<div class="flex-1 overflow-y-auto p-8 pb-32">
+<!-- Tabs and Filters -->
+<div class="flex items-center justify-between mb-8">
+<div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+<button class="px-6 py-2 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-sm font-bold text-slate-900 dark:text-white transition-all">
+                            All Questions
+                        </button>
+<button class="px-6 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-all">
+                            Unanswered
+                        </button>
+<button class="px-6 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-all">
+                            My Questions
+                        </button>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-sm font-medium text-slate-500">Sort by:</span>
+<button class="flex items-center gap-2 text-sm font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-lg">
+                            Newest First
+                            <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Masonry Question Grid -->
+<div id="questionArea" class="max-w-3xl mx-auto mt-12 hidden">
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-xl p-8 border border-slate-100 dark:border-slate-700">
+
+    <h2 class="text-2xl font-bold mb-4" id="questionText">
+      Loading question...
+    </h2>
+
+<div class="relative rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 overflow-hidden shadow-xl">
+
+  <!-- TIMER -->
+  <div
+    id="timer"
+    class="absolute top-3 right-4 text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full"
+  >
+    ⏱ 00:30
+  </div>
+
+  <!-- Rich text editor -->
+  <div
+    id="answerInput"
+    contenteditable="true"
+    class="min-h-[160px] p-4 outline-none text-slate-900 dark:text-slate-100"
+    data-placeholder="Type your answer here..."
+  ></div>
+
+  <!-- Toolbar -->
+  <div class="flex flex-wrap items-center justify-center gap-3 border-t border-slate-200 dark:border-slate-600 py-2 bg-slate-50 dark:bg-slate-800">
+    <button onclick="formatText('bold')" class="font-bold">B</button>
+    <button onclick="formatText('italic')" class="italic">I</button>
+    <button onclick="formatText('underline')" class="underline">U</button>
+
+    <div class="h-4 w-px bg-slate-300 dark:bg-slate-600"></div>
+
+    <!-- Color palette -->
+    <button onclick="setColor('#000000')" class="w-4 h-4 rounded-full bg-black"></button>
+    <button onclick="setColor('#ef4444')" class="w-4 h-4 rounded-full bg-red-500"></button>
+    <button onclick="setColor('#f59e0b')" class="w-4 h-4 rounded-full bg-amber-500"></button>
+    <button onclick="setColor('#10b981')" class="w-4 h-4 rounded-full bg-emerald-500"></button>
+    <button onclick="setColor('#3b82f6')" class="w-4 h-4 rounded-full bg-blue-500"></button>
+    <button onclick="setColor('#8b5cf6')" class="w-4 h-4 rounded-full bg-violet-500"></button>
+    <button onclick="setColor('#ec4899')" class="w-4 h-4 rounded-full bg-pink-500"></button>
+
+    <!-- Custom Color Button -->
+<button
+  onclick="document.getElementById('colorPicker').click()"
+  class="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-500 bg-gradient-to-br from-red-500 via-yellow-400 to-blue-500"
+  title="Custom color"
+></button>
+
+<!-- Hidden Color Picker -->
+<input
+  id="colorPicker"
+  type="color"
+  class="hidden"
+  onchange="setColor(this.value)"
+/>
+
+  </div>
+</div>
+
+<style>
+  #answerInput:empty:before {
+    content: attr(data-placeholder);
+    color: #94a3b8;
+  }
+</style>
+
+
+<style>
+  /* Placeholder for contenteditable */
+  #answerInput:empty:before {
+    content: attr(data-placeholder);
+    color: #94a3b8;
+  }
+</style>
+
+
+    <div class="flex justify-end mt-4">
+      <button
+        onclick="submitAnswer()"
+        class="bg-primary text-slate-900 px-6 py-3 rounded-xl font-bold hover:scale-105 active:scale-95 transition-all"
+      >
+        Submit Answer
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<div id="waitingArea" class="text-center text-slate-500 mt-24">
+  <span class="material-symbols-outlined text-6xl text-primary mb-4">hourglass_empty</span>
+  <p class="text-lg font-semibold">Waiting for teacher to start a question…</p>
+</div>
+
+<!-- Question Card 1 -->
+
+<!-- Floating Action Button -->
+<div class="absolute bottom-8 right-8 group">
+<!--<button class="flex items-center gap-3 bg-primary text-slate-900 px-6 py-4 rounded-2xl font-bold shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:scale-110 active:scale-95 transition-all group-hover:pr-8">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="tracking-tight">Ask a Question</span>
+</button>-->
+</div>
+<!-- Bottom Gradient Overlay -->
+<div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background-light dark:from-background-dark pointer-events-none"></div>
+</main>
+
+</body>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const avatar = localStorage.getItem("avatarImage");
+  const profileBtn = document.getElementById("profileBtn");
+  const profileMenu = document.getElementById("profileMenu");
+
+  // Set avatar
+  if (avatar) {
+    profileBtn.style.backgroundImage = `url(${avatar})`;
+  } else {
+    profileBtn.innerHTML = "👤";
+  }
+
+  // Toggle dropdown
+  profileBtn.addEventListener("click", () => {
+    profileMenu.classList.toggle("hidden");
+  });
+
+  // Close when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!profileBtn.contains(e.target)) {
+      profileMenu.classList.add("hidden");
+    }
+  });
+});
+
+// Navigation
+function goToProfile() {
+  window.location.href = "/static/profile.html";
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = "/static/join.html";
+}
+</script>
+
+</html>

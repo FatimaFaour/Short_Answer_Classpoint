@@ -219,3 +219,12 @@ def save_profile(data: dict):
 
     return {"status": "ok"}
 
+@app.post("/api/question/start")
+def start_question():
+    # logic start question
+    return {"status": "started"}
+
+@app.post("/api/question/close")
+def close_question():
+    # logic close question
+    return {"status": "closed"}

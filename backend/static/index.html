@@ -17,12 +17,11 @@
 
 <script>
 let studentId = null;
-let participantId = null;
 let sessionId = null;
 let questionId = null;
 
 async function join() {
-  const res = await fetch("/api/join", {
+  const res = await fetch("http://127.0.0.1:8000/join", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
@@ -30,64 +29,36 @@ async function join() {
       nickname: document.getElementById("name").value
     })
   });
-
   const data = await res.json();
-  if (data.error) {
-    alert(data.error);
-    return;
-  }
-
   studentId = data.student_id;
-  participantId = data.participant_id;
   sessionId = data.session_id;
-
-  document.getElementById("question").innerText =
-    "Joined successfully. Waiting for question...";
+  loadQuestion();
 }
 
 async function loadQuestion() {
-  if (!sessionId) return;
-
-  const res = await fetch(`/api/question/${sessionId}`);
+  const res = await fetch(`http://127.0.0.1:8000/question/${sessionId}`);
   const data = await res.json();
-
-  if (!data || !data.id) {
-    document.getElementById("question").innerText =
-      "Waiting for teacher question...";
-    questionId = null;
-    return;
+  if (data.question) {
+    questionId = data.id;
+    document.getElementById("question").innerText = data.text;
+  } else {
+    document.getElementById("question").innerText = "Waiting for question...";
   }
-
-  questionId = data.id;
-  document.getElementById("question").innerText = data.text;
 }
 
-// auto refresh every 2 seconds (ClassPoint behavior)
-setInterval(loadQuestion, 2000);
-
 async function submit() {
-  if (!questionId) {
-    alert("No active question");
-    return;
-  }
-
-  await fetch("/api/answer", {
+  await fetch("http://127.0.0.1:8000/answer", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
       question_id: questionId,
       student_id: studentId,
-      participant_id: participantId,
       answer: document.getElementById("answer").value
     })
   });
-
   alert("Answer submitted!");
-  document.getElementById("answer").value = "";
 }
 </script>
-
-
 
 </body>
 </html>

@@ -14,8 +14,17 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 
 @app.get("/")
-def serve_index():
-    return FileResponse(os.path.join(BASE_DIR, "static", "index.html"))
+def join():
+    return FileResponse("static/join.html")
+
+@app.get("/profile")
+def profile():
+    return FileResponse("static/profile.html")
+
+@app.get("/dashboard")
+def dashboard():
+    return FileResponse("static/dashboard.html")
+
 
 # ------------------ MODELS ------------------
 class JoinRequest(BaseModel):
@@ -172,20 +181,6 @@ def get_answers(question_id: int):
         for r in rows
     ]
 
-# ------------------ STAR / UNSTAR ANSWER ------------------
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute(
-        "UPDATE answers SET starred = NOT starred WHERE id = %s",
-        (answer_id,)
-    )
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    return {"status": "ok"}
 
 @app.post("/api/star/{answer_id}")
 def toggle_star(answer_id: int):
@@ -202,3 +197,25 @@ def toggle_star(answer_id: int):
     conn.close()
 
     return {"status": "ok"}
+
+@app.post("/api/student/profile")
+def save_profile(data: dict):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        "UPDATE students SET display_name=%s WHERE id=%s",
+        (data["full_name"], data["student_id"])
+    )
+
+    cur.execute(
+        "UPDATE participants SET nickname=%s WHERE id=%s",
+        (data["full_name"], data["participant_id"])
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"status": "ok"}
+

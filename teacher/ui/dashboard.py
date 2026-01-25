@@ -1,5 +1,8 @@
 import flet as ft
 import time
+
+from teacher.ui.summary_view import summary_view
+
 from ..config import CARD, DASHBOARD_BUTTON_STYLE, PRIMARY, BG
 from .live_question import live_question_view
 from ..utils import generate_code
@@ -49,6 +52,26 @@ def dashboard_view(page, teacher_id, teacher_name, state):
                 on_close=close_current_question,
             )
         )
+    def show_summary(question):
+        page.clean()
+        page.add(
+            summary_view(
+                page,
+                question,
+                on_back=lambda e: (
+                    page.clean(),
+                    page.add(
+                        dashboard_view(
+                            page,
+                            teacher_id,
+                            teacher_name,
+                            state
+                        )
+                    )
+                )
+
+            )
+        )
 
 
     def close_current_question(e=None):
@@ -58,12 +81,14 @@ def dashboard_view(page, teacher_id, teacher_name, state):
         close_question(state.current_question_id)
 
         state.closed_questions.insert(
-            0,
-            {
-                "text": state.current_question_text,
-                "duration": duration,
-            }
-        )
+                0,
+                {
+                    "id": state.current_question_id,   # 👈 THIS LINE
+                    "text": state.current_question_text,
+                    "duration": duration,
+                }
+            )
+
 
         state.current_question_id = None
         state.current_question_text = None
@@ -93,7 +118,11 @@ def dashboard_view(page, teacher_id, teacher_name, state):
                         [
                             ft.Text(q["text"], expand=True, weight="bold"),
                             ft.Text(q["duration"]),
-                            ft.TextButton("View Summary"),
+                            ft.TextButton(
+                                    "View Summary",
+                                    on_click=lambda e, q=q: show_summary(q)
+                                )
+
                         ]
                     ),
                 )

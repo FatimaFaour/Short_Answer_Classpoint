@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Short Answer Settings</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 16px;
+      color: #323130;
+    }
+    h1 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #c8c6c4;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #0078d4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .status {
+      margin-top: 12px;
+      padding: 8px;
+      border-radius: 4px;
+      background: #f3f2f1;
+      color: #323130;
+      min-height: 18px;
+    }
+    .status.error {
+      background: #fde7e9;
+      color: #a80000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Short Answer Settings</h1>
+
+  <label for="apiBaseUrl">API Base URL</label>
+  <input id="apiBaseUrl" type="text" placeholder="https://api.example.com" />
+
+  <label for="questionId">Question ID</label>
+  <input id="questionId" type="text" placeholder="question-123" />
+
+  <label for="sessionCode">Session Code</label>
+  <input id="sessionCode" type="text" placeholder="ABC123" />
+
+  <button id="saveSettings">Save Settings</button>
+
+  <div id="status" class="status"></div>
+
+  <script src="taskpane.js"></script>
+</body>
+</html>

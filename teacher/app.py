@@ -1,10 +1,10 @@
 import flet as ft
-from .config import BG
-from .state import AppState
-from .ui.login import login_view
-from .ui.dashboard import dashboard_view
-from .ui.setup import setup_view
-from .ui.live_question import live_question_view
+from teacher.config import BG
+from teacher.state import AppState
+from teacher.ui.login import login_view
+from teacher.ui.dashboard import dashboard_view
+from teacher.ui.setup import setup_view
+from teacher.ui.live_question import live_question_view
 
 def main(page: ft.Page):
     page.title = "Teacher Dashboard"

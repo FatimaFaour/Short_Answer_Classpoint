@@ -4,9 +4,10 @@
   "private": true,
   "description": "PowerPoint Web Add-in for Short Answer",
   "scripts": {
-    "start": "http-server ./ -p 3000 -S -C %USERPROFILE%\\.office-addin-dev-certs\\localhost.crt -K %USERPROFILE%\\.office-addin-dev-certs\\localhost.key"
-    "start:http": "http-server ./ -p 3000"
+  "start": "http-server ./ -p 3000 -S -C %USERPROFILE%\\.office-addin-dev-certs\\localhost.crt -K %USERPROFILE%\\.office-addin-dev-certs\\localhost.key",
+  "start:http": "http-server ./ -p 3000"
   },
+
   "devDependencies": {
     "http-server": "^14.1.1",
     "office-addin-dev-certs": "^1.12.6"

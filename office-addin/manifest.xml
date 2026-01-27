@@ -11,17 +11,17 @@
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Short Answer" />
   <Description DefaultValue="Insert a Short Answer button and start sessions from slides." />
-  <IconUrl DefaultValue="https://github.com/FatimaFaour/Short_Answer_Classpoint/tree/main/office-addin/assets/icon-32.png" />
-  <HighResolutionIconUrl DefaultValue="https://github.com/FatimaFaour/Short_Answer_Classpoint/tree/main/office-addin/assets/icon-80.png" />
-  <SupportUrl DefaultValue="https://github.com/FatimaFaour/Short_Answer_Classpoint/tree/main/support" />
+  <IconUrl DefaultValue="https://shortanswerclasspoint.netlify.app/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://shortanswerclasspoint.netlify.app/assets/icon-80.png" />
+  <SupportUrl DefaultValue="https://shortanswerclasspoint.netlify.app" />
   <AppDomains>
-    <AppDomain>https://github.com/FatimaFaour/Short_Answer_Classpoint/tree/main</AppDomain>
+    <AppDomain>https://shortanswerclasspoint.netlify.app</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Presentation" />
   </Hosts>
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://github.com/FatimaFaour/Short_Answer_Classpoint/tree/main/office-addin/src/taskpane.html" />
+    <SourceLocation DefaultValue="https://shortanswerclasspoint.netlify.app/src/taskpane.html" />
   </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
 
@@ -80,13 +80,13 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16" DefaultValue="https://github.com/FatimaFaour/Short_Answer_Classpoint/tree/main/office-addin/assets/icon-16.png" />
-        <bt:Image id="Icon.32" DefaultValue="https://github.com/FatimaFaour/Short_Answer_Classpoint/tree/main/office-addin/assets/icon-32.png" />
-        <bt:Image id="Icon.80" DefaultValue="https://github.com/FatimaFaour/Short_Answer_Classpoint/tree/main/office-addin/assets/icon-80.png" />
+        <bt:Image id="Icon.16" DefaultValue="https://shortanswerclasspoint.netlify.app/assets/icon-16.png" />
+        <bt:Image id="Icon.32" DefaultValue="https://shortanswerclasspoint.netlify.app/assets/icon-32.png" />
+        <bt:Image id="Icon.80" DefaultValue="https://shortanswerclasspoint.netlify.app/assets/icon-80.png" />
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://github.com/FatimaFaour/Short_Answer_Classpoint/tree/main/office-addin/src/taskpane.html" />
-        <bt:Url id="Commands.Url" DefaultValue="https://github.com/FatimaFaour/Short_Answer_Classpoint/tree/main/office-addin/src/commands.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://https://short-answer-classpoint.netlify.app/src/taskpane.html" />
+        <bt:Url id="Commands.Url" DefaultValue="https://shortanswerclasspoint.netlify.app/src/commands.html" />
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="ShortAnswer.GroupLabel" DefaultValue="Short Answer" />

@@ -47,7 +47,7 @@ async function insertShortAnswerButton(event) {
 
       let shape;
       try {
-        shape = slide.shapes.addGeometricShape(PowerPoint.GeometricShapeType.roundedRectangle);
+        shape = slide.shapes.addGeometricShape(PowerPoint.GeometricShapeType.rectangle);
       } catch (shapeError) {
         shape = slide.shapes.addTextBox("Short Answer");
       }

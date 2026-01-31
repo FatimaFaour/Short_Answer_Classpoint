@@ -1,7 +1,7 @@
 import flet as ft
 import time
 import asyncio
-from ..services.api import get_answers
+from ..services.api import get_answers, toggle_star
 from ..config import CARD, PRIMARY
 
 
@@ -16,6 +16,43 @@ def live_question_view(page, state, on_close):
         scroll=ft.ScrollMode.AUTO,
         expand=True,
     )
+    def build_answer_card(a):
+        def on_toggle(e):
+            toggle_star(a["id"])
+            a["starred"] = e.control.value
+
+        return ft.Container(
+        expand=True,
+        padding=14,
+        bgcolor=CARD,
+        border_radius=14,
+        content=ft.Column(
+            [
+                ft.Row(
+                    [
+                        ft.Checkbox(
+                            value=a.get("starred", False),
+                            on_change=on_toggle,
+                        ),
+                        ft.Text(
+                            a["text"],
+                            size=14,
+                            expand=True,
+                        ),
+                    ],
+                    spacing=8,
+                ),
+                ft.Divider(),
+                ft.Text(
+                    a["name"] if not state.hide_names else "Anonymous",
+                    size=12,
+                    color="#6b7280",
+                ),
+            ],
+            spacing=6,
+        ),
+    )
+
 
     # ---------- UPDATE UI ----------
     def update_ui():
@@ -33,24 +70,8 @@ def live_question_view(page, state, on_close):
 
         row_cards = []
         for a in answers:
-            card = ft.Container(
-                expand=True,
-                padding=14,
-                bgcolor=CARD,
-                border_radius=14,
-                content=ft.Column(
-                    [
-                        ft.Text(a["text"], size=14),
-                        ft.Divider(),
-                        ft.Text(
-                            a["name"] if not state.hide_names else "Anonymous",
-                            size=12,
-                            color="#6b7280",
-                        ),
-                    ],
-                    spacing=6,
-                ),
-            )
+            card = build_answer_card(a)
+
 
             row_cards.append(card)
 
@@ -111,21 +132,21 @@ def live_question_view(page, state, on_close):
     )
 
     # ---------- SEARCH BAR (visual only) ----------
-    search_bar = ft.Container(
-        padding=12,
-        content=ft.Row(
-            [
-                ft.TextField(
-                    hint_text="⌕ Search name or answer",
-                    border_radius=20,
-                    expand=True,
-                ),
-                ft.Text("Showing"),
-                submissions_text,
-                ft.Text("responses"),
-            ],
-        ),
-    )
+    #search_bar = ft.Container(
+    #    padding=12,
+    #    content=ft.Row(
+    #        [
+    #            ft.TextField(
+    #                hint_text="⌕ Search name or answer",
+    #                border_radius=20,
+    #                expand=True,
+    #            ),
+    #            ft.Text("Showing"),
+    #            submissions_text,
+    #            ft.Text("responses"),
+    #        ],
+    #    ),
+    #)
 
     # ---------- FOOTER ----------
     footer = ft.Container(

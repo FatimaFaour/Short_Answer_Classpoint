@@ -9,7 +9,7 @@
   <Version>1.0.0.0</Version>
   <ProviderName>Short Answer</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Short Answer (Dev)" />
+  <DisplayName DefaultValue="Short Answer" />
   <Description DefaultValue="Insert a Short Answer button and start sessions from slides." />
   <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png" />
   <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-80.png" />

@@ -1,6 +1,7 @@
 import flet as ft
 import time
 
+from teacher.ui.reviews_answers import review_answers_view
 from teacher.ui.summary_view import summary_view
 
 from ..config import CARD, DASHBOARD_BUTTON_STYLE, PRIMARY, BG
@@ -68,10 +69,20 @@ def dashboard_view(page, teacher_id, teacher_name, state):
                             state
                         )
                     )
+                ),
+                on_review=lambda q: (
+                    page.clean(),
+                    page.add(
+                        review_answers_view(
+                            page,
+                            q,
+                            on_back=lambda e: show_summary(q)
+                        )
+                    )
                 )
-
             )
         )
+
 
 
     def close_current_question(e=None):

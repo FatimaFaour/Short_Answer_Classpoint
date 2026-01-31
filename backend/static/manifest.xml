@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+  xsi:type="TaskPaneApp">
+
+  <!-- BASIC INFO -->
+  <Id>f2b8c2a1-1234-4cde-9abc-123456789000</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>ISDI</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Short Answer ClassPoint"/>
+  <Description DefaultValue="Interactive short answer questions for PowerPoint"/>
+  <IconUrl DefaultValue="https://localhost:8765/static/icon.png"/>
+  <HighResolutionIconUrl DefaultValue="https://localhost:8765/static/icon.png"/>
+
+  <!-- REQUIRED -->
+  <Hosts>
+    <Host Name="Presentation"/>
+  </Hosts>
+
+  <Requirements>
+    <Sets DefaultMinVersion="1.1">
+      <Set Name="PresentationApi"/>
+    </Sets>
+  </Requirements>
+
+  <!-- TASK PANE -->
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://localhost:8765/static/taskpane.html"/>
+  </DefaultSettings>
+
+  <!-- PERMISSIONS -->
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <!-- VERSION OVERRIDES -->
+  <VersionOverrides
+    xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+    xsi:type="VersionOverridesV1_0">
+
+    <Hosts>
+      <Host xsi:type="Presentation">
+
+        <!-- RIBBON -->
+        <DesktopFormFactor>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="ClassPointGroup">
+                <Label resid="GroupLabel"/>
+
+                <!-- OPEN SIDEBAR -->
+                <Control xsi:type="Button" id="OpenTaskPane">
+                  <Label resid="OpenPaneLabel"/>
+                  <Supertip>
+                    <Title resid="OpenPaneLabel"/>
+                    <Description resid="OpenPaneDesc"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon16"/>
+                    <bt:Image size="32" resid="Icon32"/>
+                    <bt:Image size="80" resid="Icon80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <SourceLocation resid="TaskpaneUrl"/>
+                  </Action>
+                </Control>
+
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+
+      </Host>
+    </Hosts>
+
+    <!-- RESOURCES -->
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon16" DefaultValue="https://localhost:8765/static/icon.png"/>
+        <bt:Image id="Icon32" DefaultValue="https://localhost:8765/static/icon.png"/>
+        <bt:Image id="Icon80" DefaultValue="https://localhost:8765/static/icon.png"/>
+      </bt:Images>
+
+      <bt:Urls>
+        <bt:Url id="TaskpaneUrl" DefaultValue="https://localhost:8765/static/taskpane.html"/>
+      </bt:Urls>
+
+      <bt:ShortStrings>
+        <bt:String id="GroupLabel" DefaultValue="ClassPoint"/>
+        <bt:String id="OpenPaneLabel" DefaultValue="Open ClassPoint"/>
+      </bt:ShortStrings>
+
+      <bt:LongStrings>
+        <bt:String id="OpenPaneDesc" DefaultValue="Start and control live questions"/>
+      </bt:LongStrings>
+    </Resources>
+
+  </VersionOverrides>
+</OfficeApp>

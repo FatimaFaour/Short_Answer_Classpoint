@@ -6,5 +6,7 @@ def get_answers(question_id):
         f"{API_BASE}/answers/{question_id}"
     ).json()
 
-def star_answer(answer_id):
-    requests.post(f"{API_BASE}/star/{answer_id}")
+def toggle_star(answer_id):
+    requests.post(
+        f"{API_BASE}/star/{answer_id}"
+    )

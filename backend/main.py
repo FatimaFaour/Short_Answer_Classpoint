@@ -15,7 +15,7 @@ app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), na
 
 @app.get("/")
 def join():
-    return FileResponse("static/join.html")
+    return FileResponse(os.path.join(BASE_DIR, "static", "join.html"))
 
 @app.get("/profile")
 def profile():

@@ -6,18 +6,76 @@ def get_teacher_by_email(email):
         [email],
         fetch=True
     )
-def get_answer_stats(question_id):
-    return run_query(
-        """
+def get_common_answers(question_id, limit=5):
+    query = """
         SELECT
-            COUNT(*) AS answered,
-            COUNT(*) FILTER (WHERE starred = true) AS starred
+            LOWER(TRIM(answer_text)) AS answer,
+            COUNT(*) AS count
         FROM answers
         WHERE question_id = %s
-        """,
-        [question_id],
-        fetch=True
-    )[0]
+          AND answer_text IS NOT NULL
+          AND TRIM(answer_text) <> ''
+        GROUP BY LOWER(TRIM(answer_text))
+        HAVING COUNT(*) > 1
+        ORDER BY count DESC
+        LIMIT %s
+    """
+    rows = run_query(query, [question_id, limit], fetch=True)
+    return rows or []
+def get_starred_answers(question_id, limit=5):
+    query = """
+        SELECT answer_text
+        FROM answers
+        WHERE question_id = %s
+          AND starred = TRUE
+          AND answer_text IS NOT NULL
+          AND TRIM(answer_text) <> ''
+        LIMIT %s
+    """
+    rows = run_query(query, [question_id, limit], fetch=True)
+    return [r[0] for r in rows] if rows else []
+
+def get_quality_breakdown(question_id):
+    query = """
+        SELECT
+            COUNT(*) FILTER (WHERE LENGTH(answer_text) >= 40) AS clear,
+            COUNT(*) FILTER (
+                WHERE LENGTH(answer_text) BETWEEN 20 AND 39
+            ) AS partial,
+            COUNT(*) FILTER (WHERE LENGTH(answer_text) < 20) AS weak
+        FROM answers
+        WHERE question_id = %s
+          AND answer_text IS NOT NULL
+          AND TRIM(answer_text) <> ''
+    """
+    rows = run_query(query, [question_id], fetch=True)
+
+    if not rows:
+        return 0, 0, 0
+
+    return rows[0]
+
+def get_answer_stats(question_id):
+    query = """
+        SELECT
+            COUNT(*) AS answered,
+            COUNT(*) FILTER (WHERE starred = TRUE) AS starred,
+            COUNT(DISTINCT LOWER(TRIM(answer_text))) AS unique_answers
+        FROM answers
+        WHERE question_id = %s
+          AND answer_text IS NOT NULL
+          AND TRIM(answer_text) <> ''
+    """
+    rows = run_query(query, [question_id], fetch=True)
+
+    if not rows:
+        return 0, 0, 0, 0
+
+    answered, starred, unique_answers = rows[0]
+
+    avg_time = 0  # placeholder until timestamps exist
+    return answered, starred, avg_time, unique_answers
+
 
 def get_answers(question_id):
     return run_query(
@@ -60,6 +118,23 @@ def create_question(session_id, text):
         [session_id, text],
         fetch=True
     )[0][0]
+
+def get_common_answers(question_id, limit=5):
+    query = """
+        SELECT 
+            answer_text,
+            COUNT(*) AS count
+        FROM answers
+        WHERE question_id = %s
+          AND answer_text IS NOT NULL
+          AND TRIM(answer_text) <> ''
+        GROUP BY answer_text
+        HAVING COUNT(*) > 1
+        ORDER BY count DESC
+        LIMIT %s
+    """
+    rows = run_query(query, [question_id, limit], fetch=True)
+    return rows or []
 
 def close_question(question_id):
     run_query(

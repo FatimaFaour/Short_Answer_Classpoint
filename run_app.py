@@ -1,39 +1,28 @@
-import subprocess
-import sys
-import time
-import os
+import threading
+import flet as ft
+import uvicorn
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+from backend.main import app as fastapi_app
+from teacher.app import main as flet_main
 
-def start_fastapi():
-    return subprocess.Popen(
-        [
-            sys.executable,
-            "-m",
-            "uvicorn",
-            "main:app",
-            "--host", "127.0.0.1",
-            "--port", "8000",
-        ],
-        cwd=BASE_DIR,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+
+def run_fastapi():
+    config = uvicorn.Config(
+        fastapi_app,
+        host="127.0.0.1",
+        port=8000,
+        log_level="info",
+        lifespan="on",
+        reload=False,
+        access_log=False,
     )
+    server = uvicorn.Server(config)
+    server.run()
 
-def start_flet():
-    return subprocess.Popen(
-        [
-            sys.executable,
-            "-m",
-            "teacher.app",
-        ],
-        cwd=BASE_DIR,
-    )
 
 if __name__ == "__main__":
-    api = start_fastapi()
-    time.sleep(2)  # wait for backend
-    ui = start_flet()
+    # شغّل FastAPI بالخلفية
+    threading.Thread(target=run_fastapi, daemon=True).start()
 
-    ui.wait()
-    api.terminate()
+    # شغّل Flet UI
+    ft.app(target=flet_main)

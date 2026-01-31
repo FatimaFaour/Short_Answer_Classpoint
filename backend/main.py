@@ -16,15 +16,18 @@ app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), na
 @app.get("/")
 def join():
     return FileResponse(os.path.join(BASE_DIR, "static", "join.html"))
+<<<<<<< HEAD
+=======
+
+>>>>>>> ad16ec2a30450054e3b6feebfc4101481a5f07f4
 
 @app.get("/profile")
 def profile():
-    return FileResponse("static/profile.html")
+    return FileResponse(os.path.join(BASE_DIR, "static", "profile.html"))
 
 @app.get("/dashboard")
 def dashboard():
-    return FileResponse("static/dashboard.html")
-
+    return FileResponse(os.path.join(BASE_DIR, "static", "dashboard.html"))
 
 # ------------------ MODELS ------------------
 class JoinRequest(BaseModel):

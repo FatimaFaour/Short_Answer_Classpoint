@@ -1,3 +1,4 @@
+from ensurepip import bootstrap
 import flet as ft
 from teacher.config import BG
 from teacher.state import AppState
@@ -5,6 +6,9 @@ from teacher.ui.login import login_view
 from teacher.ui.dashboard import dashboard_view
 from teacher.ui.setup import setup_view
 from teacher.ui.live_question import live_question_view
+from teacher.bootsrap_db import bootstrap_tables
+
+bootstrap_tables()
 
 def main(page: ft.Page):
     page.title = "Teacher Dashboard"
@@ -65,5 +69,6 @@ def main(page: ft.Page):
 
     # ---------- INITIAL VIEW ----------
     show_login()
+    #show_setup(teacher_id=1, teacher_name="Demo Teacher")
 
 ft.app(target=main)

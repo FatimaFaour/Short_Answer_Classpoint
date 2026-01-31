@@ -92,21 +92,14 @@ def get_question(session_id: int):
     # auto-close expired questions
     cur.execute(
         """
-        UPDATE questions
-        SET is_open=false
-        WHERE session_id=%s
-          AND is_open=true
-          AND auto_close_at IS NOT NULL
-          AND auto_close_at < NOW()
-        """,
-        (session_id,)
-    )
-
-    cur.execute(
-        """
-        SELECT id, text
+        SELECT
+            id,
+            text,
+            is_open,
+            auto_close_at,
+            (auto_close_at IS NOT NULL AND auto_close_at < NOW()) AS is_timed_out
         FROM questions
-        WHERE session_id=%s AND is_open=true
+        WHERE session_id=%s
         ORDER BY created_at DESC
         LIMIT 1
         """,
@@ -114,20 +107,76 @@ def get_question(session_id: int):
     )
 
     q = cur.fetchone()
+    if not q:
+        cur.close()
+        conn.close()
+        return {"id": None, "timed_out": False}
+
+    question_id, question_text, is_open, auto_close_at, is_timed_out = q
+
+    if is_timed_out and is_open:
+        cur.execute(
+            "UPDATE questions SET is_open=false WHERE id=%s",
+            (question_id,)
+        )
+        is_open = False
+
     conn.commit()
     cur.close()
     conn.close()
 
-    if not q:
-        return {"id": None}
+    if is_timed_out:
+        return {
+            "id": None,
+            "timed_out": True,
+            "message": "Timeout question",
+        }
 
-    return {"id": q[0], "text": q[1]}
+
+    if not is_open:
+        return {"id": None, "timed_out": False}
+
+    return {
+        "id": question_id,
+        "text": question_text,
+        "timed_out": False,
+        "timeout_at": auto_close_at.isoformat() if auto_close_at else None,
+    }
+
 
 # ------------------ SUBMIT ANSWER ------------------
 @app.post("/api/answer")
 def submit_answer(data: AnswerRequest):
     conn = get_connection()
     cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT is_open, auto_close_at,
+               (auto_close_at IS NOT NULL AND auto_close_at < NOW()) AS is_timed_out
+        FROM questions
+        WHERE id=%s
+        """,
+        (data.question_id,)
+    )
+    question_row = cur.fetchone()
+    if not question_row:
+        cur.close()
+        conn.close()
+        return {"status": "error", "message": "Question not found"}
+
+    is_open, auto_close_at, is_timed_out = question_row
+    if is_timed_out and is_open:
+        cur.execute(
+            "UPDATE questions SET is_open=false WHERE id=%s",
+            (data.question_id,)
+        )
+        is_open = False
+
+    if is_timed_out or not is_open:
+        conn.commit()
+        cur.close()
+        conn.close()
+        return {"status": "timeout", "message": "Timeout question"}
 
     cur.execute(
         """

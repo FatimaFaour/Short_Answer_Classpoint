@@ -62,6 +62,9 @@
 
 
 <script>
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const sessionId = localStorage.getItem("sessionId");
   const studentId = localStorage.getItem("studentId");
@@ -82,21 +85,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   let timeLeft = 30; // seconds
 let timerInterval = null;
+function formatTimer(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.max(0, seconds % 60);
+  return `⏱ ${minutes.toString().padStart(2, "0")}:${remainingSeconds
+    .toString()
+    .padStart(2, "0")}`;
+}
 
-function startTimer(duration = 30) {
+
+function startTimer(duration) {
   clearInterval(timerInterval);
   timeLeft = duration;
 
   const timerEl = document.getElementById("timer");
   const input = document.getElementById("answerInput");
 
-  timerEl.textContent = `⏱ 00:${timeLeft.toString().padStart(2, "0")}`;
+  timerEl.textContent = formatTimer(timeLeft);
+  timerEl.classList.remove("text-red-500");
   input.contentEditable = "true";
 
   timerInterval = setInterval(() => {
     timeLeft--;
 
-    timerEl.textContent = `⏱ 00:${timeLeft.toString().padStart(2, "0")}`;
+    timerEl.textContent = formatTimer(timeLeft);
 
     if (timeLeft <= 5) {
       timerEl.classList.add("text-red-500");
@@ -107,18 +119,50 @@ function startTimer(duration = 30) {
       timerEl.textContent = "⏱ Time up";
       input.contentEditable = "false";
       input.classList.add("opacity-50");
+      setTimeoutState(true);
     }
   }, 1000);
 }
 
-  const myQuestionsTab = document.getElementById("myQuestionsTab");
+   const myQuestionsTab = document.getElementById("myQuestionsTab");
   const myQuestionsArea = document.getElementById("myQuestionsArea");
   const questionArea = document.getElementById("questionArea");
   const waitingArea = document.getElementById("waitingArea");
+  const timeoutMessage = document.getElementById("timeoutMessage");
   const questionText = document.getElementById("questionText");
   const answerInput = document.getElementById("answerInput");
+  const submitButton = document.getElementById("submitButton");
 
   let currentQuestionId = null;
+  let questionTimedOut = false;
+
+  function setTimeoutState(isTimedOut) {
+    questionTimedOut = isTimedOut;
+    if (!timeoutMessage || !answerInput || !submitButton) {
+      return;
+    }
+
+    if (isTimedOut) {
+      timeoutMessage.textContent = "Timeout question";
+      timeoutMessage.classList.remove("hidden");
+      const timerEl = document.getElementById("timer");
+      if (timerEl) {
+        timerEl.textContent = "⏱ Time up";
+        timerEl.classList.add("text-red-500");
+      }
+      clearInterval(timerInterval);
+      answerInput.contentEditable = "false";
+      answerInput.classList.add("opacity-50");
+      submitButton.setAttribute("disabled", "true");
+      submitButton.classList.add("opacity-50", "cursor-not-allowed");
+    } else {
+      timeoutMessage.classList.add("hidden");
+      answerInput.contentEditable = "true";
+      answerInput.classList.remove("opacity-50");
+      submitButton.removeAttribute("disabled");
+      submitButton.classList.remove("opacity-50", "cursor-not-allowed");
+    }
+  }
 
   if (myQuestionsTab && myQuestionsArea) {
     myQuestionsTab.addEventListener("click", async () => {
@@ -160,7 +204,20 @@ function startTimer(duration = 30) {
   async function loadQuestion() {
     try {
       const res = await fetch(`/api/question/${sessionId}`);
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data) {
+        throw new Error("Invalid response from server");
+      }
+
+      if (data.timed_out) {
+        currentQuestionId = null;
+        questionArea.classList.remove("hidden");
+        waitingArea.classList.add("hidden");
+        questionText.textContent = data.text || "Question closed";
+        setTimeoutState(true);
+        return;
+      }
 
       // No active question
       if (!data.id) {
@@ -185,7 +242,13 @@ function startTimer(duration = 30) {
 
   // Submit answer
   window.submitAnswer = async function () {
-    if (!currentQuestionId) return;
+    if (!currentQuestionId || questionTimedOut) {
+      if (questionTimedOut) {
+        alert("Timeout question");
+      }
+      return;
+    }
+
 
     const answer = answerInput.innerHTML.trim();
     if (!answer) {
@@ -194,7 +257,7 @@ function startTimer(duration = 30) {
     }
 
     try {
-      await fetch("/api/answer", {
+      const response = await fetch("/api/answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -204,6 +267,14 @@ function startTimer(duration = 30) {
           answer: answer
         })
       });
+
+      const responseData = await response.json().catch(() => null);
+      if (responseData && responseData.status === "timeout") {
+        setTimeoutState(true);
+        alert("Timeout question");
+        return;
+      }
+
 
       answerInput.innerHTML = "";
       alert("Answer submitted ✅");
@@ -326,6 +397,7 @@ function setColor(color) {
     <h2 class="text-2xl font-bold mb-4" id="questionText">
       Loading question...
     </h2>
+    <p id="timeoutMessage" class="hidden text-red-500 font-semibold mb-4"></p>
 
 <div class="relative rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 overflow-hidden shadow-xl">
 

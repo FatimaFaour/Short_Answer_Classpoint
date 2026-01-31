@@ -108,14 +108,22 @@ def create_session(teacher_id, code):
         fetch=True
     )[0][0]
 
-def create_question(session_id, text):
+def create_question(session_id, text, timeout_seconds=None):
     return run_query(
         """
-        INSERT INTO questions (session_id, text, is_open)
-        VALUES (%s, %s, true)
+        INSERT INTO questions (session_id, text, is_open, auto_close_at)
+        VALUES (
+            %s,
+            %s,
+            true,
+            CASE
+                WHEN %s IS NULL THEN NULL
+                ELSE NOW() + (%s * INTERVAL '1 second')
+            END
+        )
         RETURNING id
         """,
-        [session_id, text],
+        [session_id, text, timeout_seconds, timeout_seconds],
         fetch=True
     )[0][0]
 

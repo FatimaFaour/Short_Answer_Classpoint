@@ -84,45 +84,81 @@ document.addEventListener("DOMContentLoaded", () => {
     classCodeEl.textContent = classCode;
   }
   let timeLeft = 30; // seconds
-let timerInterval = null;
-function formatTimer(seconds) {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.max(0, seconds % 60);
-  return `⏱ ${minutes.toString().padStart(2, "0")}:${remainingSeconds
-    .toString()
-    .padStart(2, "0")}`;
-}
-
-
-function startTimer(duration) {
-  clearInterval(timerInterval);
-  timeLeft = duration;
-
-  const timerEl = document.getElementById("timer");
-  const input = document.getElementById("answerInput");
-
-  timerEl.textContent = formatTimer(timeLeft);
-  timerEl.classList.remove("text-red-500");
-  input.contentEditable = "true";
-
-  timerInterval = setInterval(() => {
-    timeLeft--;
-
+  let timerInterval = null;
+  let currentTimeoutAt = null;
+  function formatTimer(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.max(0, seconds % 60);
+    return `⏱ ${minutes.toString().padStart(2, "0")}:${remainingSeconds
+      .toString()
+      .padStart(2, "0")}`;
+  }
+ function updateTimerDisplay() {
+    const timerEl = document.getElementById("timer");
+    if (!timerEl || timeLeft === null) {
+      return;
+    }
     timerEl.textContent = formatTimer(timeLeft);
-
     if (timeLeft <= 5) {
       timerEl.classList.add("text-red-500");
+    } else {
+      timerEl.classList.remove("text-red-500");
     }
+  }
+  function setUnlimitedTimer() {
+    clearInterval(timerInterval);
+    timeLeft = null;
+    const timerEl = document.getElementById("timer");
+    if (timerEl) {
+      timerEl.textContent = "⏱ --:--";
+      timerEl.classList.remove("text-red-500");
+    }
+  }
+  
+function startTimer(duration) {
+    clearInterval(timerInterval);
+    timeLeft = duration;
+    const timerEl = document.getElementById("timer");
+    const input = document.getElementById("answerInput");
 
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      timerEl.textContent = "⏱ Time up";
-      input.contentEditable = "false";
-      input.classList.add("opacity-50");
-      setTimeoutState(true);
+    timerEl.textContent = formatTimer(timeLeft);
+    timerEl.classList.remove("text-red-500");
+    input.contentEditable = "true";
+
+    updateTimerDisplay();
+    input.contentEditable = "true";
+
+    
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+
+    
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        if (timerEl) {
+          timerEl.textContent = "⏱ Time up";
+        }
+        input.contentEditable = "false";
+        input.classList.add("opacity-50");
+        setTimeoutState(true);
+      }
+    }, 1000);
+  }
+
+    
+  function parseTimeoutAt(timeoutAt) {
+    if (!timeoutAt) {
+      return null;
     }
-  }, 1000);
-}
+    
+    const parsed = Date.parse(timeoutAt);
+    if (!Number.isNaN(parsed)) {
+      return parsed;
+    }
+    const parsedWithUtc = Date.parse(`${timeoutAt}Z`);
+    return Number.isNaN(parsedWithUtc) ? null : parsedWithUtc;
+  }
 
    const myQuestionsTab = document.getElementById("myQuestionsTab");
   const myQuestionsArea = document.getElementById("myQuestionsArea");
@@ -234,7 +270,30 @@ function startTimer(duration) {
       waitingArea.classList.add("hidden");
       questionArea.classList.remove("hidden");
 
-      startTimer(120);
+      if (data.timeout_at) {
+        const timeoutAt = new Date(data.timeout_at);
+        const timeoutAtMs = Number.isNaN(timeoutAt.getTime())
+          ? null
+          : timeoutAt.getTime();
+        if (timeoutAtMs) {
+          const secondsLeft = Math.ceil((timeoutAtMs - Date.now()) / 1000);
+          if (secondsLeft <= 0) {
+            setTimeoutState(true);
+            return;
+          }
+          if (isNewQuestion || currentTimeoutAt !== timeoutAtMs) {
+            currentTimeoutAt = timeoutAtMs;
+            setTimeoutState(false);
+            startTimer(secondsLeft);
+          }
+        } else {
+          currentTimeoutAt = null;
+          setUnlimitedTimer();
+        }
+      } else {
+        currentTimeoutAt = null;
+        setUnlimitedTimer();
+      }
     } catch (err) {
       console.error("Error loading question:", err);
     }

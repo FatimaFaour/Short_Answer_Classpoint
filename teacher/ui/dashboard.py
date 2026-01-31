@@ -41,7 +41,7 @@ def dashboard_view(page, teacher_id, teacher_name, state):
         state.current_question_id = create_question(
             state.session_id,
             question_input.value,
-            timeout_seconds=timeout_seconds,
+            timeout_seconds=state.auto_close_seconds,
         )
         state.current_question_text = question_input.value
         state.question_start_ts = time.time()

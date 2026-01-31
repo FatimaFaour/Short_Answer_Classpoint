@@ -62,40 +62,6 @@
 
 
 <script>
-  const myQuestionsTab = document.getElementById("myQuestionsTab");
-const myQuestionsArea = document.getElementById("myQuestionsArea");
-const questionArea = document.getElementById("questionArea");
-const waitingArea = document.getElementById("waitingArea");
-
-myQuestionsTab.addEventListener("click", async () => {
-  // Hide other areas
-  questionArea.classList.add("hidden");
-  waitingArea.classList.add("hidden");
-  myQuestionsArea.classList.remove("hidden");
-
-  // Fetch submitted answers
-  try {
-    const res = await fetch(`/api/my-answers/${studentId}`);
-    const data = await res.json();
-
-    if (!data.length) {
-      myQuestionsArea.innerHTML = `<p class="text-center text-slate-500">No answers submitted yet.</p>`;
-      return;
-    }
-
-    // Render each question and answer
-    myQuestionsArea.innerHTML = data.map(item => `
-      <div class="bg-white dark:bg-slate-800 rounded-xl shadow-xl p-6 mb-4 border border-slate-100 dark:border-slate-700">
-        <h3 class="font-bold mb-2">${item.question}</h3>
-        <p class="text-slate-700 dark:text-slate-200">${item.answer}</p>
-      </div>
-    `).join('');
-  } catch (err) {
-    console.error("Error fetching my questions:", err);
-    myQuestionsArea.innerHTML = `<p class="text-center text-red-500">Failed to load your answers.</p>`;
-  }
-});
-
 document.addEventListener("DOMContentLoaded", () => {
   const sessionId = localStorage.getItem("sessionId");
   const studentId = localStorage.getItem("studentId");
@@ -145,6 +111,8 @@ function startTimer(duration = 30) {
   }, 1000);
 }
 
+  const myQuestionsTab = document.getElementById("myQuestionsTab");
+  const myQuestionsArea = document.getElementById("myQuestionsArea");
   const questionArea = document.getElementById("questionArea");
   const waitingArea = document.getElementById("waitingArea");
   const questionText = document.getElementById("questionText");
@@ -152,6 +120,36 @@ function startTimer(duration = 30) {
 
   let currentQuestionId = null;
 
+  if (myQuestionsTab && myQuestionsArea) {
+    myQuestionsTab.addEventListener("click", async () => {
+      // Hide other areas
+      questionArea.classList.add("hidden");
+      waitingArea.classList.add("hidden");
+      myQuestionsArea.classList.remove("hidden");
+
+      // Fetch submitted answers
+      try {
+        const res = await fetch(`/api/my-answers/${studentId}`);
+        const data = await res.json();
+
+        if (!data.length) {
+          myQuestionsArea.innerHTML = `<p class="text-center text-slate-500">No answers submitted yet.</p>`;
+          return;
+        }
+
+        // Render each question and answer
+        myQuestionsArea.innerHTML = data.map(item => `
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-xl p-6 mb-4 border border-slate-100 dark:border-slate-700">
+            <h3 class="font-bold mb-2">${item.question}</h3>
+            <p class="text-slate-700 dark:text-slate-200">${item.answer}</p>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error("Error fetching my questions:", err);
+        myQuestionsArea.innerHTML = `<p class="text-center text-red-500">Failed to load your answers.</p>`;
+      }
+    });
+  }
   // Change class (back to join)
   window.changeClass = function () {
     localStorage.clear();

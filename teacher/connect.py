@@ -5,7 +5,7 @@ from psycopg2 import sql
 
 DB_NAME = "short_ans_classpoint"
 USER = "postgres"
-PASSWORD = "123456"
+PASSWORD = "ahmad1807"
 HOST = "localhost"
 PORT = "5432"
 

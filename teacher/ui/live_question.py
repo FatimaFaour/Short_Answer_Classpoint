@@ -173,7 +173,7 @@ def live_question_view(page, state, on_close):
     return ft.Column(
         [
             header,
-            search_bar,
+            #search_bar,
             responses_column,
             footer,
         ],

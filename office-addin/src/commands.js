@@ -10,6 +10,33 @@ const SETTINGS_KEYS = {
 Office.onReady(() => {
   Office.actions.associate("insertShortAnswerButton", insertShortAnswerButton);
 });
+function openTeacherAppWithFallback(protocolUrl) {
+  const dialogUrl = new URL("protocol-dialog.html", window.location.origin);
+  dialogUrl.searchParams.set("protocolUrl", protocolUrl);
+
+  const showDialog = () => {
+    Office.context.ui.displayDialogAsync(
+      dialogUrl.toString(),
+      { height: 50, width: 40 },
+      () => {}
+    );
+  };
+
+  try {
+    if (Office.context.ui.openBrowserWindow) {
+      Office.context.ui.openBrowserWindow(protocolUrl);
+    } else {
+      window.location.href = protocolUrl;
+    }
+  } catch (error) {
+    showDialog();
+    return;
+  }
+
+  setTimeout(showDialog, 1500);
+}
+
+
 
 async function insertShortAnswerButton(event) {
   try {

@@ -14,4 +14,5 @@ class AppState:
         #self.current_question_id = None
         self.current_question_text = None
        # self.question_start_ts = None
+        self.pending_session = None
         

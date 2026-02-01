@@ -1,10 +1,30 @@
 function resolveLoginUrl() {
   const currentUrl = new URL(window.location.href);
-  const overrideUrl = currentUrl.searchParams.get("loginUrl");
-  if (overrideUrl) {
-    return overrideUrl;
-  }
-    return `${currentUrl.origin}/teacher/login`;
+  return `${currentUrl.origin}/teacher/ui/login`;
+}
+function login() {
+  Office.context.ui.displayDialogAsync(
+    "https://shortanswerclasspoint.netlify.app/teacher/ui/login",
+    { height: 60, width: 30 },
+    function (result) {
+      if (result.status !== Office.AsyncResultStatus.Succeeded) {
+        console.error("Dialog failed to open");
+        return;
+      }
+
+      const dialog = result.value;
+
+      dialog.addEventHandler(
+        Office.EventType.DialogMessageReceived,
+        function (arg) {
+          console.log("Login success:", arg.message);
+          dialog.close();
+
+          // store token/session here
+        }
+      );
+    }
+  );
 }
 
 

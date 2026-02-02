@@ -1,0 +1,108 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E5F73BBF-2052-4628-8A2D-CC949259CD62}|PowerPointVstoAddIn.csproj|c:\\users\\user\\desktop\\m2-isdi\\short_answer_classpoint\\short_answer_classpoint\\powerpointvstoaddin\\ribbon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5F73BBF-2052-4628-8A2D-CC949259CD62}|PowerPointVstoAddIn.csproj|solutionrelative:ribbon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5F73BBF-2052-4628-8A2D-CC949259CD62}|PowerPointVstoAddIn.csproj|c:\\users\\user\\desktop\\m2-isdi\\short_answer_classpoint\\short_answer_classpoint\\powerpointvstoaddin\\teacherpanel.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5F73BBF-2052-4628-8A2D-CC949259CD62}|PowerPointVstoAddIn.csproj|solutionrelative:teacherpanel.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5F73BBF-2052-4628-8A2D-CC949259CD62}|PowerPointVstoAddIn.csproj|c:\\users\\user\\desktop\\m2-isdi\\short_answer_classpoint\\short_answer_classpoint\\powerpointvstoaddin\\teacherpanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{E5F73BBF-2052-4628-8A2D-CC949259CD62}|PowerPointVstoAddIn.csproj|solutionrelative:teacherpanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5F73BBF-2052-4628-8A2D-CC949259CD62}|PowerPointVstoAddIn.csproj|c:\\users\\user\\desktop\\m2-isdi\\short_answer_classpoint\\short_answer_classpoint\\powerpointvstoaddin\\thisaddin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5F73BBF-2052-4628-8A2D-CC949259CD62}|PowerPointVstoAddIn.csproj|solutionrelative:thisaddin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5F73BBF-2052-4628-8A2D-CC949259CD62}|PowerPointVstoAddIn.csproj|c:\\users\\user\\desktop\\m2-isdi\\short_answer_classpoint\\short_answer_classpoint\\powerpointvstoaddin\\teacherpanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5F73BBF-2052-4628-8A2D-CC949259CD62}|PowerPointVstoAddIn.csproj|solutionrelative:teacherpanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{56df62a4-05a3-4e5b-aa1a-99371ccfb997}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Ribbon.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\Ribbon.cs",
+              "RelativeDocumentMoniker": "Ribbon.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\Ribbon.cs",
+              "RelativeToolTip": "Ribbon.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-02T04:40:27.731Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ThisAddIn.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\ThisAddIn.cs",
+              "RelativeDocumentMoniker": "ThisAddIn.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\ThisAddIn.cs",
+              "RelativeToolTip": "ThisAddIn.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAA5wCAAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-02T04:40:22.11Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "TeacherPanel.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\TeacherPanel.cs",
+              "RelativeDocumentMoniker": "TeacherPanel.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\TeacherPanel.cs",
+              "RelativeToolTip": "TeacherPanel.cs",
+              "ViewState": "AgIAACgAAAAAAAAAAAAqwC4AAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-02T04:02:53.808Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TeacherPanel.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\TeacherPanel.Designer.cs",
+              "RelativeDocumentMoniker": "TeacherPanel.Designer.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\TeacherPanel.Designer.cs",
+              "RelativeToolTip": "TeacherPanel.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-02T04:02:42.406Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TeacherPanel.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\TeacherPanel.cs",
+              "RelativeDocumentMoniker": "TeacherPanel.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\M2-ISDI\\Short_Answer_Classpoint\\Short_Answer_Classpoint\\PowerPointVstoAddIn\\TeacherPanel.cs [Design]",
+              "RelativeToolTip": "TeacherPanel.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-02T04:02:38.826Z",
+              "EditorCaption": " [Design]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

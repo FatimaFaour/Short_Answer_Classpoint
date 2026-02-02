@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui"
+          onLoad="Ribbon_Load">
+	<ribbon>
+		<tabs>
+			<tab idMso="TabHome">
+				<group id="ShortAnswerGroup" label="Short Answer">
+					<button id="StartShortAnswer"
+							label="Start Short Answer"
+							size="large"
+							imageMso="HappyFace"
+							onAction="OnStartShortAnswer"/>
+				</group>
+			</tab>
+		</tabs>
+	</ribbon>
+</customUI>

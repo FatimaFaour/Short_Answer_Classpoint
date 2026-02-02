@@ -1,0 +1,13 @@
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\bin\Debug\PowerPointVstoAddIn.dll
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\bin\Debug\PowerPointVstoAddIn.pdb
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\bin\Debug\PowerPointVstoAddIn.dll.manifest
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\bin\Debug\PowerPointVstoAddIn.vsto
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.dll
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\obj\Debug\PowerPointVstoAddIn.csproj.AssemblyReference.cache
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\obj\Debug\PowerPointVstoAddIn.Properties.Resources.resources
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\obj\Debug\PowerPointVstoAddIn.csproj.GenerateResource.cache
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\obj\Debug\PowerPointVstoAddIn.csproj.CoreCompileInputs.cache
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\obj\Debug\PowerPoi.C47C6B58.Up2Date
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\obj\Debug\PowerPointVstoAddIn.dll
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\obj\Debug\PowerPointVstoAddIn.pdb
+C:\Users\user\Desktop\M2-ISDI\Short_Answer_Classpoint\Short_Answer_Classpoint\PowerPointVstoAddIn\obj\Debug\PowerPointVstoAddIn.TeacherPanel.resources

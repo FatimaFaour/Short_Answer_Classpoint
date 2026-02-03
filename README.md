@@ -1,17 +1,31 @@
 
 # 📊 PowerPoint Short Answer Add-in
  
+<<<<<<< HEAD
 Short Answer ClassPoint is a **PowerPoint VSTO Add-in** paired with a **FastAPI backend** that enables live short-answer questions during presentations. The teacher controls the flow directly from PowerPoint, while students respond through a lightweight web app.
 ---
 **Implemented By:**
 Batoul Kanaan -- batoul0120@hotmail.com
 Fatima Faour -- Fatiimafr22@gmail.com
 ---
+=======
+Short Answer ClassPoint is a **PowerPoint VSTO Add-in** paired with a **FastAPI backend** and **Flet App** that enables live short-answer questions during presentations. The teacher controls the flow directly from PowerPoint, while students respond through a lightweight web app.
+
+**Done By:** Batoul Kanaan& Fatima Faour
+
+**Presented for:** Dr. Hassan Harb
+
+>>>>>>> a0797f98dd06b58d920e51cee8a8d0bea442e6aa
 This README is written as a **simple running guide**, with clear places to add screenshots for:
  
 * PowerPoint add-in
 * Teacher panel
+<<<<<<< HEAD
 * Student view
+=======
+* Student Website view
+ 
+>>>>>>> a0797f98dd06b58d920e51cee8a8d0bea442e6aa
 
 ---
  
@@ -21,8 +35,8 @@ This README is written as a **simple running guide**, with clear places to add s
 * PowerPoint **Ribbon button** to start a short-answer session
 * Automatically **adds a button to the slide**
 * Opens a **teacher desktop panel** (login, setup, dashboard, answers, summary, review)
-* Starts **FastAPI backend services**
-* Separate **teacher** and **student** endpoints
+* Starts **Flet App service** for teachers as panel
+* Starts **FastAPI backend service** for students
 * Student web app with **login, profile, and answering pages**
  
 
@@ -65,9 +79,8 @@ Short_Answer_Classpoint/
 * Windows 10 / 11
 * Microsoft PowerPoint (Desktop)
 * Visual Studio 2022
- * Python 3.10+
+* Python 3.10+
 * PostgreSQL dB
-* (Teacher app) `flet` installed
 
 ### Database Setup
 The backend and teacher apps connect to a local Postgres database using:
@@ -76,8 +89,8 @@ The backend and teacher apps connect to a local Postgres database using:
 * **Password:** `yourpassword`
 * **Host:** `localhost`
 * **Port:** `5432`
+> Enter your password instead of "yourpassword" 
 
-Create the database if it does not exist:
 
 ### Python Packages
 
@@ -85,8 +98,6 @@ Create the database if it does not exist:
 pip install -r requirements.txt
  ```
  
----
-## 🧪 Backend Setup (FastAPI)
 
  
 ## Suggested Workflow
@@ -117,7 +128,9 @@ pip install -r requirements.txt
 
 PowerPoint will launch automatically with the add-in loaded.
 
----
+
+---![Launch PowerPoint](screenshots/powerpoint.png)
+
 
 ## 🖱️ Teacher Flow (Desktop App)
 
@@ -126,21 +139,15 @@ PowerPoint will launch automatically with the add-in loaded.
 ### Step 1 — Start session
 
 * In PowerPoint, go to **Home → Short Answer**
+![PP Screenshot](screenshots/addin.png)
 * Click **Start Short Answer**
-
-📸 *Screenshot placeholder:*
-
-> *(Add screenshot of PowerPoint ribbon button here)*
 
 ---
 
 ### Step 2 — Slide button added
 
 * A button labeled **“Answer Question”** is added to the current slide
-
-📸 *Screenshot placeholder:*
-
-> *(Add screenshot of slide with inserted button here)*
+![Ribbon Screenshot](screenshots/ribbon.png)
 
 ---
 
@@ -148,89 +155,83 @@ PowerPoint will launch automatically with the add-in loaded.
 
 * The teacher panel opens on the right
 * Click **Teacher Login**
+![Login Screenshot](screenshots/TeacherLogin.png)
 
-📸 *Screenshot placeholder:*
-
-> *(Add screenshot of teacher login page here)*
-
+* You can create your own account
+![Signin Screenshot](screenshots/TeacherCreate.png)
+**Now Login with your new account**
+![LoginNow Screenshot](screenshots/Login.png)
 ---
 
 ### Step 4 — Setup page
 
-* Configure session settings such as:
+  * Configure session settings such as:
   * Multiple submissions
   * Anonymous mode
   * Auto-close timer
-
-📸 *Screenshot placeholder:*
-
-> *(Add screenshot of setup page here)*
+![Setup Screenshot](screenshots/TeacherSetup.png)
 
 ---
 
-### Step 5 — Dashboard page
+### Step 5 — Quiz page
 
 * Launch a question
-* Monitor live answers
-* Close submissions when finished
-
-📸 *Screenshot placeholder:*
-
-> *(Add screenshot of dashboard page here)*
+![Ques Screenshot](screenshots/Ques.png)
 
 ---
 
 ### Step 6 — Answers page
 
-* View all collected responses
-* Filter or highlight specific answers
-
-📸 *Screenshot placeholder:*
-
-> *(Add screenshot of answers page here)*
-
+* Monitor live answers
+* Close submissions when finished
+* You can check the correct answer
+![Ans Screenshot](screenshots/Answer.png)
+* You can check the correct answer
+![dash Screenshot](screenshots/dash.png)
+#### After Closing Submissions
+![ques Screenshot](screenshots/ques2.png)
 ---
 
 ### Step 7 — Summary page
 
 * See aggregated results
-* Highlight common themes
-
-📸 *Screenshot placeholder:*
-
-> *(Add screenshot of summary page here)*
+* Highlight common answers
+![summary Screenshot](screenshots/summary.png)
 
 ---
 
 ### Step 8 — Review page
 
 * Review individual submissions
-* Provide follow-up feedback or notes
-
-📸 *Screenshot placeholder:*
-
-> *(Add screenshot of review page here)*
+![Review Screenshot](screenshots/review.png)
 
 ---
 
 ## 👩‍🎓 Student Flow (Web App)
 
-1. Students open a browser
-2. Navigate to:
+### 1. Students open a browser
+### 2. Navigate to:
 
    ```
    http://<teacher-ip>:8000
    ```
+   ![Student Page](screenshots/startSt.png)
 
-3. Student pages include:
+### 3. Student pages include:
 
-   * **Login Page** – enter class code
-   * **Profile Page** – update name and details
-   * **Answering Page** – submit short answers
-
-📸 *Screenshot placeholder:*
-
-> *(Add screenshot of student answering interface here)*
+   #### 3.1 **Login Page** – enter class code
+   ![Join Screenshot](screenshots/code.png)
+   #### 3.2 **Profile Page** – enter name and add profile photo
+   ![Profile Screenshot](screenshots/Profile.png)
+   #### 3.3 **Answering Page** – receive questions and submit short answers
+   * Wait for teacher to send questions
+   ![Wait Screenshot](screenshots/wait.png)
+   * After asking  write a short answer
+   ![Answering Screenshot](screenshots/ans.png)
+   * Submit the answer
+   ![Submit Screenshot](screenshots/submit.png)
+   * In case the question is timeout:
+   ![Close Screenshot](screenshots/closed.png)
 
 ---
 

@@ -1,31 +1,19 @@
 
 # 📊 PowerPoint Short Answer Add-in
- 
-<<<<<<< HEAD
+
 Short Answer ClassPoint is a **PowerPoint VSTO Add-in** paired with a **FastAPI backend** that enables live short-answer questions during presentations. The teacher controls the flow directly from PowerPoint, while students respond through a lightweight web app.
 ---
 **Implemented By:**
 Batoul Kanaan -- batoul0120@hotmail.com
 Fatima Faour -- Fatiimafr22@gmail.com
 ---
-=======
-Short Answer ClassPoint is a **PowerPoint VSTO Add-in** paired with a **FastAPI backend** and **Flet App** that enables live short-answer questions during presentations. The teacher controls the flow directly from PowerPoint, while students respond through a lightweight web app.
 
-**Done By:** Batoul Kanaan& Fatima Faour
-
-**Presented for:** Dr. Hassan Harb
-
->>>>>>> a0797f98dd06b58d920e51cee8a8d0bea442e6aa
 This README is written as a **simple running guide**, with clear places to add screenshots for:
  
 * PowerPoint add-in
 * Teacher panel
-<<<<<<< HEAD
 * Student view
-=======
 * Student Website view
- 
->>>>>>> a0797f98dd06b58d920e51cee8a8d0bea442e6aa
 
 ---
  
